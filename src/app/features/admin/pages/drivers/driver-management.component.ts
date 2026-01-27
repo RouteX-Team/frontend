@@ -9,7 +9,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
-import { DropdownModule } from 'primeng/dropdown';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -27,7 +27,7 @@ import { User } from '../../../../data/models';
         ButtonModule,
         InputTextModule,
         DialogModule,
-        DropdownModule,
+        AutoCompleteModule,
         ConfirmDialogModule,
         ToastModule
     ],

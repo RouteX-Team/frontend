@@ -42,22 +42,22 @@
     </section>
 </div>
 
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-    <button class="nav-btn active">
+<!-- Bottom Navigation slot for MainLayout -->
+<nav class="bottom-nav" bottomNav>
+    <button class="nav-btn" [class.active]="true" (click)="filter.set('all')">
         <i class="pi pi-home"></i>
         <span>Home</span>
     </button>
-    <button class="nav-btn">
+    <button class="nav-btn" (click)="filter.set('all')">
         <i class="pi pi-map"></i>
         <span>Map</span>
     </button>
-    <button class="nav-btn">
+    <button class="nav-btn" (click)="filter.set('favorites')">
         <i class="pi pi-star"></i>
         <span>Favorites</span>
     </button>
     <button class="nav-btn" (click)="authService.logout()">
-        <i class="pi pi-user"></i>
-        <span>Profile</span>
+        <i class="pi pi-sign-out"></i>
+        <span>Logout</span>
     </button>
 </nav>

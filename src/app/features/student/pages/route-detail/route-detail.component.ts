@@ -58,6 +58,27 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
         return id ? this.favorites().includes(id) : false;
     });
 
+    // Prepare stops with pre-calculated distance and ETA
+    stopsWithStats = computed(() => {
+        const route = this.currentRoute();
+        if (!route) return [];
+
+        return route.stops.map((stop, index) => {
+            const baseDistance = 1.2;
+            const incrementalDistance = 0.5;
+            const distanceValue = (baseDistance + (index * incrementalDistance)).toFixed(1);
+
+            const baseTime = 3;
+            const etaValue = (index * baseTime);
+
+            return {
+                ...stop,
+                distance: `${distanceValue} km`,
+                eta: `${etaValue} min`
+            };
+        });
+    });
+
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
         this.routeId.set(id);
@@ -103,18 +124,5 @@ export class RouteDetailComponent implements OnInit, OnDestroy {
 
     goBack(): void {
         this.router.navigate(['/student']);
-    }
-
-    getDistance(index: number): string {
-        // Mock distance calculation based on index to be deterministic
-        const baseDistance = 1.2;
-        const incrementalDistance = 0.5;
-        return (baseDistance + (index * incrementalDistance)).toFixed(1) + ' km';
-    }
-
-    getTimeToStop(order: number): string {
-        // Mock time calculation based on order
-        const baseTime = 3;
-        return (order * baseTime) + ' min';
     }
 }

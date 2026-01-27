@@ -53,14 +53,22 @@
             <div class="field mb-4">
                 <label for="name">Route Name</label>
                 <input type="text" pInputText id="name" [(ngModel)]="currentRoute().name" required autofocus />
-                <small class="p-error" *ngIf="submitted() && !currentRoute().name">Name is required.</small>
+                <small class="p-error">
+                    @if (submitted() && !currentRoute().name) {
+                    Name is required.
+                    }
+                </small>
             </div>
 
             <div class="grid flex">
                 <div class="field col-6 mr-2">
                     <label for="code">Short Code</label>
                     <input type="text" pInputText id="code" [(ngModel)]="currentRoute().shortCode" required />
-                    <small class="p-error" *ngIf="submitted() && !currentRoute().shortCode">Code is required.</small>
+                    <small class="p-error">
+                        @if (submitted() && !currentRoute().shortCode) {
+                        Code is required.
+                        }
+                    </small>
                 </div>
                 <div class="field col-6">
                     <label for="color">Theme Color</label>

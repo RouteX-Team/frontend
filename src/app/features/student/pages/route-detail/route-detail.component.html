@@ -20,7 +20,8 @@
                 [buses]='activeBus() ? [activeBus()!] : []'>
             </rx-map>
 
-            <div class="bus-status-float" *ngIf='activeBus()'>
+            @if (activeBus()) {
+            <div class="bus-status-float">
                 <div class="bus-info">
                     <i class="pi pi-truck bus-icon"></i>
                     <div class="info">
@@ -28,11 +29,8 @@
                         <rx-status-badge [status]='activeBus()?.status || "offline"'></rx-status-badge>
                     </div>
                 </div>
-                <!-- <div class="eta-prediction">
-                    <span class="label">Next Stop ETA</span>
-                    <span class="value">4 min</span>
-                </div> -->
             </div>
+            }
         </section>
 
         <!-- Stops Section -->
@@ -43,38 +41,43 @@
             </div>
 
             <div class="stops-timeline">
-                <div class="stop-item" *ngFor='let stop of currentRoute()?.stops; let i = index'>
+                @for (stop of stopsWithStats(); track $index; let i = $index) {
+                <div class="stop-item">
                     <div class="timeline-indicator">
                         <div class="dot" [class.main]='stop.isMainStop'></div>
-                        <div class="line" *ngIf='i < (currentRoute()?.stops?.length || 0) - 1'></div>
+                        @if (i < (stopsWithStats().length || 0) - 1) { <div class="line">
                     </div>
-                    <div class="stop-details">
-                        <div class="stop-info">
-                            <h3>{{ stop.name }}</h3>
-                            <!-- <p class="address">{{ stop.address }}</p> -->
-                        </div>
-                        <div class="stop-stats">
-                            <span class="eta">{{ getTimeToStop(i) }}</span>
-                            <span class="dist text-muted">{{ getDistance(i) }}</span>
-                        </div>
+                    }
+                </div>
+                <div class="stop-details">
+                    <div class="stop-info">
+                        <h3>{{ stop.name }}</h3>
+                    </div>
+                    <div class="stop-stats">
+                        <span class="eta">{{ stop.eta }}</span>
+                        <span class="dist text-muted">{{ stop.distance }}</span>
                     </div>
                 </div>
             </div>
-
-            <div class="route-info-card" *ngIf='currentRoute()'>
-                <p class="description">{{ currentRoute()?.description }}</p>
-                <div class="info-footer">
-                    <div class="info-item">
-                        <i class="pi pi-clock"></i>
-                        <span>Frequency: {{ currentRoute()?.frequency }} min</span>
-                    </div>
-                    <div class="info-item">
-                        <i class="pi pi-calendar"></i>
-                        <span>{{ currentRoute()?.operatingHours?.start }} - {{ currentRoute()?.operatingHours?.end
-                            }}</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+            }
     </div>
+
+    @if (currentRoute()) {
+    <div class="route-info-card">
+        <p class="description">{{ currentRoute()?.description }}</p>
+        <div class="info-footer">
+            <div class="info-item">
+                <i class="pi pi-clock"></i>
+                <span>Frequency: {{ currentRoute()?.frequency }} min</span>
+            </div>
+            <div class="info-item">
+                <i class="pi pi-calendar"></i>
+                <span>{{ currentRoute()?.operatingHours?.start }} - {{ currentRoute()?.operatingHours?.end
+                    }}</span>
+            </div>
+        </div>
+    </div>
+    }
+    </section>
+</div>
 </div>

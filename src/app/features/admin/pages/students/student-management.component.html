@@ -51,13 +51,21 @@
             <div class="field mb-4">
                 <label for="name">Full Name</label>
                 <input type="text" pInputText id="name" [(ngModel)]="currentUser().name" required autofocus />
-                <small class="p-error" *ngIf="submitted() && !currentUser().name">Name is required.</small>
+                <small class="p-error">
+                    @if (submitted() && !currentUser().name) {
+                    Name is required.
+                    }
+                </small>
             </div>
 
             <div class="field mb-4">
                 <label for="email">Email Address</label>
                 <input type="email" pInputText id="email" [(ngModel)]="currentUser().email" required />
-                <small class="p-error" *ngIf="submitted() && !currentUser().email">Email is required.</small>
+                <small class="p-error">
+                    @if (submitted() && !currentUser().email) {
+                    Email is required.
+                    }
+                </small>
             </div>
         </ng-template>
 

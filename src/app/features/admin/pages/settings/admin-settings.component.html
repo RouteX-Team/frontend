@@ -1,0 +1,185 @@
+<div class="admin-page-container">
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Settings</h1>
+            <p class="text-muted">Configure system preferences and options</p>
+        </div>
+        <div class="header-actions">
+            <button pButton label="Export" icon="pi pi-download" class="p-button-outlined"
+                (click)="exportSettings()"></button>
+            <button pButton label="Save Changes" icon="pi pi-check" (click)="saveSettings()"></button>
+        </div>
+    </header>
+
+    <div class="settings-grid">
+        <!-- General Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="pi pi-cog"></i>
+                </div>
+                <div>
+                    <h2>General</h2>
+                    <p>Basic system configuration</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="field">
+                    <label for="systemName">System Name</label>
+                    <input type="text" pInputText id="systemName" [(ngModel)]="settings().systemName" />
+                </div>
+
+                <div class="field">
+                    <label for="universityName">University / Organization Name</label>
+                    <input type="text" pInputText id="universityName" [(ngModel)]="settings().universityName" />
+                </div>
+
+                <div class="field">
+                    <label for="supportEmail">Support Email</label>
+                    <input type="email" pInputText id="supportEmail" [(ngModel)]="settings().supportEmail" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Appearance -->
+        <div class="settings-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="pi pi-palette"></i>
+                </div>
+                <div>
+                    <h2>Appearance</h2>
+                    <p>Visual preferences and theme</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Dark Mode</span>
+                        <span class="toggle-description">Use dark theme across the application</span>
+                    </div>
+                    <p-toggleSwitch [ngModel]="isDarkMode()" (ngModelChange)="toggleTheme()"></p-toggleSwitch>
+                </div>
+
+                <p-divider></p-divider>
+
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Show Bus Capacity</span>
+                        <span class="toggle-description">Display seat capacity on bus cards</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().showBusCapacity"></p-toggleSwitch>
+                </div>
+
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Show Estimated Arrival</span>
+                        <span class="toggle-description">Display ETA on route cards</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().showEstimatedArrival"></p-toggleSwitch>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking Settings -->
+        <div class="settings-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="pi pi-map-marker"></i>
+                </div>
+                <div>
+                    <h2>Tracking</h2>
+                    <p>GPS and location settings</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="field">
+                    <label for="updateInterval">Update Interval</label>
+                    <p-select id="updateInterval" [options]="intervalOptions"
+                        [(ngModel)]="settings().trackingUpdateInterval"
+                        optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+                    <small class="field-hint">How often to fetch location updates</small>
+                </div>
+
+                <div class="field">
+                    <label for="maxEta">Maximum ETA Display (minutes)</label>
+                    <p-inputNumber id="maxEta" [(ngModel)]="settings().maxEtaMinutes"
+                        [min]="10" [max]="120" suffix=" min"></p-inputNumber>
+                </div>
+
+                <div class="field">
+                    <label for="delayThreshold">Delay Threshold (minutes)</label>
+                    <p-inputNumber id="delayThreshold" [(ngModel)]="settings().showDelayedThreshold"
+                        [min]="1" [max]="30" suffix=" min"></p-inputNumber>
+                    <small class="field-hint">Mark bus as delayed after this many minutes behind schedule</small>
+                </div>
+
+                <div class="field">
+                    <label for="mapZoom">Default Map Zoom</label>
+                    <p-select id="mapZoom" [options]="zoomOptions" [(ngModel)]="settings().defaultMapZoom"
+                        optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="settings-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="pi pi-bell"></i>
+                </div>
+                <div>
+                    <h2>Notifications</h2>
+                    <p>Alert and notification preferences</p>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Email Notifications</span>
+                        <span class="toggle-description">Receive updates via email</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().enableEmailNotifications"></p-toggleSwitch>
+                </div>
+
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Push Notifications</span>
+                        <span class="toggle-description">Browser push notifications</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().enablePushNotifications"></p-toggleSwitch>
+                </div>
+
+                <p-divider></p-divider>
+
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Notify on Delay</span>
+                        <span class="toggle-description">Alert when a bus is running late</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().notifyOnDelay"></p-toggleSwitch>
+                </div>
+
+                <div class="toggle-field">
+                    <div class="toggle-info">
+                        <span class="toggle-label">Notify on Arrival</span>
+                        <span class="toggle-description">Alert when bus reaches a stop</span>
+                    </div>
+                    <p-toggleSwitch [(ngModel)]="settings().notifyOnArrival"></p-toggleSwitch>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="settings-footer">
+        <button pButton label="Reset to Defaults" icon="pi pi-refresh" class="p-button-outlined p-button-secondary"
+            (click)="resetToDefaults()"></button>
+    </div>
+
+    <p-toast></p-toast>
+</div>

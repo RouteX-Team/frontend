@@ -22,8 +22,8 @@ export const ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'buses',
-                loadComponent: () => import('./pages/dashboard/admin-dashboard.component')
-                    .then(m => m.AdminDashboardComponent) // Placeholder
+                loadComponent: () => import('./pages/buses/bus-management.component')
+                    .then(m => m.BusManagementComponent)
             },
             {
                 path: 'drivers',
@@ -37,13 +37,13 @@ export const ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'assignments',
-                loadComponent: () => import('./pages/dashboard/admin-dashboard.component')
-                    .then(m => m.AdminDashboardComponent) // Placeholder
+                loadComponent: () => import('./pages/assignments/assignment-management.component')
+                    .then(m => m.AssignmentManagementComponent)
             },
             {
                 path: 'settings',
-                loadComponent: () => import('./pages/dashboard/admin-dashboard.component')
-                    .then(m => m.AdminDashboardComponent) // Placeholder
+                loadComponent: () => import('./pages/settings/admin-settings.component')
+                    .then(m => m.AdminSettingsComponent)
             }
         ]
     }

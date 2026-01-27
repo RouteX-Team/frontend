@@ -7,39 +7,49 @@
         <button pButton label="New Route" icon="pi pi-plus" (click)="openNew()"></button>
     </header>
 
-    <div class="card">
+    <div class="card shadow-md">
         <p-table [value]="routes()" [rows]="10" [paginator]="true" [globalFilterFields]="['name','shortCode']"
-            responsiveLayout="scroll" [rowHover]="true" dataKey="id">
+            responsiveLayout="scroll" [rowHover]="true" dataKey="id" styleClass="p-datatable-sm">
 
             <ng-template pTemplate="header">
                 <tr>
                     <th pSortableColumn="shortCode">Code <p-sortIcon field="shortCode"></p-sortIcon></th>
                     <th pSortableColumn="name">Route Name <p-sortIcon field="name"></p-sortIcon></th>
                     <th>Color</th>
-                    <th pSortableColumn="isActive">Status <p-sortIcon field="isActive"></p-sortIcon></th>
-                    <th>Stops</th>
-                    <th>Actions</th>
+                    <th pSortableColumn="isActive" class="text-center">Status <p-sortIcon field="isActive"></p-sortIcon>
+                    </th>
+                    <th class="text-right">Stops</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </ng-template>
 
             <ng-template pTemplate="body" let-route>
                 <tr>
-                    <td><span class="font-bold text-primary">{{ route.shortCode }}</span></td>
-                    <td>{{ route.name }}</td>
+                    <td><span class="font-bold text-indigo-600 dark:text-indigo-400">{{ route.shortCode }}</span></td>
+                    <td class="font-medium">{{ route.name }}</td>
                     <td>
-                        <div class="color-preview" [style.background-color]="route.color"></div>
+                        <div class="color-preview" [style.background-color]="route.color" [title]="route.color"></div>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <span [class]="'status-badge ' + (route.isActive ? 'active' : 'inactive')">
+                            @if (route.isActive) {
+                            <i class="pi pi-check-circle text-[10px]"></i>
+                            } @else {
+                            <i class="pi pi-times-circle text-[10px]"></i>
+                            }
                             {{ route.isActive ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
-                    <td>{{ route.stops?.length || 0 }} Stops</td>
-                    <td>
-                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                            (click)="editRoute(route)"></button>
-                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
-                            (click)="deleteRoute(route)"></button>
+                    <td class="text-right">
+                        <span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs font-semibold">
+                            {{ route.stops?.length || 0 }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info mr-2"
+                            (click)="editRoute(route)" title="Edit Route"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger"
+                            (click)="deleteRoute(route)" title="Delete Route"></button>
                     </td>
                 </tr>
             </ng-template>
@@ -48,59 +58,69 @@
 
     <!-- Edit/New Dialog -->
     <p-dialog [(visible)]="routeDialog" [style]="{width: '500px'}" header="Route Details" [modal]="true"
-        styleClass="p-fluid">
+        styleClass="p-fluid rx-dialog" [draggable]="false" [resizable]="false">
         <ng-template pTemplate="content">
-            <div class="field mb-4">
+            <div class="field">
                 <label for="name">Route Name</label>
-                <input type="text" pInputText id="name" [(ngModel)]="currentRoute().name" required autofocus />
-                <small class="p-error">
-                    @if (submitted() && !currentRoute().name) {
-                    Name is required.
-                    }
-                </small>
+                <input type="text" pInputText id="name" [(ngModel)]="currentRoute().name"
+                    placeholder="e.g. Campus Express" required autofocus />
+                @if (submitted() && !currentRoute().name) {
+                <small class="p-error block mt-1">Name is required.</small>
+                }
             </div>
 
-            <div class="grid flex">
-                <div class="field col-6 mr-2">
+            <div class="flex-grid">
+                <div class="field">
                     <label for="code">Short Code</label>
-                    <input type="text" pInputText id="code" [(ngModel)]="currentRoute().shortCode" required />
-                    <small class="p-error">
-                        @if (submitted() && !currentRoute().shortCode) {
-                        Code is required.
-                        }
-                    </small>
+                    <input type="text" pInputText id="code" [(ngModel)]="currentRoute().shortCode"
+                        placeholder="e.g. CE-01" required />
+                    @if (submitted() && !currentRoute().shortCode) {
+                    <small class="p-error block mt-1">Code is required.</small>
+                    }
                 </div>
-                <div class="field col-6">
+                <div class="field">
                     <label for="color">Theme Color</label>
-                    <input type="color" pInputText id="color" [(ngModel)]="currentRoute().color" />
+                    <div class="flex gap-2 items-center h-[42px]">
+                        <input type="color" id="color" [(ngModel)]="currentRoute().color"
+                            class="w-10 h-10 p-0 border-0 bg-transparent cursor-pointer" />
+                        <span class="text-sm font-mono text-muted">{{ currentRoute().color }}</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="field mb-4">
-                <label for="description">Description (Optional)</label>
-                <textarea id="description" pInputTextarea [(ngModel)]="currentRoute().description" rows="3"></textarea>
+            <div class="field">
+                <label for="description">Description</label>
+                <textarea id="description" pInputTextarea [(ngModel)]="currentRoute().description" rows="3"
+                    placeholder="Route coverage details..."></textarea>
             </div>
 
-            <div class="grid flex">
-                <div class="field col-6 mr-2">
-                    <label for="freq">Frequency (min)</label>
-                    <p-inputNumber id="freq" [(ngModel)]="currentRoute().frequency"></p-inputNumber>
+            <div class="flex-grid">
+                <div class="field">
+                    <label for="freq">Frequency (minutes)</label>
+                    <p-inputNumber id="freq" [(ngModel)]="currentRoute().frequency" suffix=" min" [min]="1"
+                        [showButtons]="true"></p-inputNumber>
                 </div>
-                <div class="field col-6">
-                    <label for="dur">Duration (min)</label>
-                    <p-inputNumber id="dur" [(ngModel)]="currentRoute().estimatedDuration"></p-inputNumber>
+                <div class="field">
+                    <label for="dur">Est. Duration (minutes)</label>
+                    <p-inputNumber id="dur" [(ngModel)]="currentRoute().estimatedDuration" suffix=" min" [min]="1"
+                        [showButtons]="true"></p-inputNumber>
                 </div>
             </div>
 
-            <div class="field-checkbox mt-4 flex items-center gap-2">
+            <div class="field flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg mt-2">
+                <div>
+                    <span class="font-semibold text-sm">Active Status</span>
+                    <p class="text-xs text-muted m-0">Enable or disable this route in the system</p>
+                </div>
                 <p-toggleSwitch [(ngModel)]="currentRoute().isActive" id="active"></p-toggleSwitch>
-                <label for="active">Active Status</label>
             </div>
         </ng-template>
 
         <ng-template pTemplate="footer">
-            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-            <button pButton label="Save" icon="pi pi-check" class="p-button-primary" (click)="saveRoute()"></button>
+            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text p-button-secondary"
+                (click)="hideDialog()"></button>
+            <button pButton label="Save Changes" icon="pi pi-check" class="p-button-primary shadow-sm"
+                (click)="saveRoute()"></button>
         </ng-template>
     </p-dialog>
 

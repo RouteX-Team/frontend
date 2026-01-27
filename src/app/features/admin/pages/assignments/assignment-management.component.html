@@ -1,0 +1,235 @@
+<div class="admin-page-container">
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Route Assignments</h1>
+            <p class="text-muted">Assign drivers and buses to routes</p>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card complete">
+            <div class="stat-icon">
+                <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ assignedRoutes() }}</span>
+                <span class="stat-label">Fully Assigned</span>
+            </div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="pi pi-exclamation-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ unassignedRoutes() }}</span>
+                <span class="stat-label">Need Assignment</span>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="pi pi-user"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ activeDrivers() }}/{{ drivers().length }}</span>
+                <span class="stat-label">Drivers Assigned</span>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="pi pi-truck"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">{{ activeBuses() }}/{{ buses().length }}</span>
+                <span class="stat-label">Buses Assigned</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignments Table -->
+    <div class="card">
+        <p-table [value]="assignments()" [rows]="10" [paginator]="true" responsiveLayout="scroll">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 60px">Status</th>
+                    <th>Route</th>
+                    <th>Assigned Driver</th>
+                    <th>Assigned Bus</th>
+                    <th>Route Status</th>
+                    <th style="width: 150px">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-assignment>
+                <tr>
+                    <td>
+                        @switch (getAssignmentStatus(assignment)) {
+                            @case ('complete') {
+                                <span class="assignment-status complete" pTooltip="Fully Assigned">
+                                    <i class="pi pi-check-circle"></i>
+                                </span>
+                            }
+                            @case ('partial') {
+                                <span class="assignment-status partial" pTooltip="Partially Assigned">
+                                    <i class="pi pi-exclamation-circle"></i>
+                                </span>
+                            }
+                            @default {
+                                <span class="assignment-status unassigned" pTooltip="Unassigned">
+                                    <i class="pi pi-minus-circle"></i>
+                                </span>
+                            }
+                        }
+                    </td>
+                    <td>
+                        <div class="route-info">
+                            <span class="route-code" [style.background-color]="assignment.route.color + '20'"
+                                [style.color]="assignment.route.color">
+                                {{ assignment.route.shortCode }}
+                            </span>
+                            <div>
+                                <span class="route-name">{{ assignment.route.name }}</span>
+                                <span class="route-stops">{{ assignment.route.stops.length }} stops</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (assignment.driver) {
+                            <div class="driver-info">
+                                <span class="avatar">{{ assignment.driver.name.charAt(0) }}</span>
+                                <div>
+                                    <span class="driver-name">{{ assignment.driver.name }}</span>
+                                    <span class="driver-email">{{ assignment.driver.email }}</span>
+                                </div>
+                            </div>
+                        } @else {
+                            <span class="unassigned-text">
+                                <i class="pi pi-user-minus"></i>
+                                No driver assigned
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (assignment.bus) {
+                            <div class="bus-info">
+                                <span class="bus-icon">
+                                    <i class="pi pi-truck"></i>
+                                </span>
+                                <div>
+                                    <span class="bus-name">{{ assignment.bus.name || assignment.bus.plateNumber }}</span>
+                                    <span class="bus-plate">{{ assignment.bus.plateNumber }}</span>
+                                </div>
+                            </div>
+                        } @else {
+                            <span class="unassigned-text">
+                                <i class="pi pi-truck"></i>
+                                No bus assigned
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (assignment.bus) {
+                            <rx-status-badge [status]="assignment.bus.status"></rx-status-badge>
+                        } @else {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td>
+                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2"
+                            (click)="openAssignDialog(assignment.route)" pTooltip="Edit Assignment"></button>
+                        @if (assignment.driver || assignment.bus) {
+                            <button pButton icon="pi pi-times" class="p-button-rounded p-button-warning"
+                                (click)="clearAssignment(assignment)" pTooltip="Clear Assignment"></button>
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center p-4">
+                        <i class="pi pi-link text-4xl text-muted mb-2"></i>
+                        <p>No routes available. Create routes first.</p>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Assignment Dialog -->
+    <p-dialog [(visible)]="assignDialog" [style]="{width: '500px'}" header="Edit Assignment" [modal]="true"
+        styleClass="p-fluid">
+        <ng-template pTemplate="content">
+            @if (currentRoute()) {
+                <div class="current-route-info">
+                    <span class="route-code-large" [style.background-color]="currentRoute()!.color + '20'"
+                        [style.color]="currentRoute()!.color">
+                        {{ currentRoute()!.shortCode }}
+                    </span>
+                    <div>
+                        <h3>{{ currentRoute()!.name }}</h3>
+                        <p class="text-muted">{{ currentRoute()!.stops.length }} stops ·
+                            {{ currentRoute()!.estimatedDuration }} min duration</p>
+                    </div>
+                </div>
+
+                <p-divider></p-divider>
+
+                <div class="field mb-4">
+                    <label for="driver">
+                        <i class="pi pi-user mr-2"></i>
+                        Assign Driver
+                    </label>
+                    <p-select id="driver" [options]="availableDrivers()" [(ngModel)]="selectedDriverId"
+                        optionLabel="name" optionValue="id" placeholder="Select a driver"
+                        [showClear]="true" styleClass="w-full">
+                        <ng-template pTemplate="item" let-driver>
+                            <div class="flex items-center gap-2">
+                                <span class="avatar-small">{{ driver.name.charAt(0) }}</span>
+                                <div>
+                                    <div>{{ driver.name }}</div>
+                                    <small class="text-muted">{{ driver.email }}</small>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+
+                <div class="field">
+                    <label for="bus">
+                        <i class="pi pi-truck mr-2"></i>
+                        Assign Bus
+                    </label>
+                    <p-select id="bus" [options]="availableBuses()" [(ngModel)]="selectedBusId"
+                        optionLabel="name" optionValue="id" placeholder="Select a bus"
+                        [showClear]="true" styleClass="w-full">
+                        <ng-template pTemplate="item" let-bus>
+                            <div class="flex items-center gap-2">
+                                <span class="bus-icon-small">
+                                    <i class="pi pi-truck"></i>
+                                </span>
+                                <div>
+                                    <div>{{ bus.name || bus.plateNumber }}</div>
+                                    <small class="text-muted">{{ bus.plateNumber }} · {{ bus.capacity }} seats</small>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text"
+                (click)="assignDialog.set(false)"></button>
+            <button pButton label="Save Assignment" icon="pi pi-check" class="p-button-primary"
+                (click)="saveAssignment()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    <p-toast></p-toast>
+</div>

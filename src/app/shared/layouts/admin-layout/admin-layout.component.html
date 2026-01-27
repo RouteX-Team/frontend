@@ -1,0 +1,35 @@
+<div class="admin-layout" [class.sidebar-collapsed]="sidebarCollapsed()">
+    <rx-header subtitle="Admin Dashboard" />
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+            <i [class]="sidebarCollapsed() ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+        </button>
+
+        <nav class="sidebar-nav" aria-label="Admin navigation">
+            @for (item of navItems; track item.route) {
+            <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" [title]="item.label">
+                <i [class]="'pi ' + item.icon"></i>
+                @if (!sidebarCollapsed()) {
+                <span class="nav-label">{{ item.label }}</span>
+                }
+            </a>
+            }
+        </nav>
+
+        <div class="sidebar-footer">
+            @if (!sidebarCollapsed()) {
+            <div class="user-info">
+                <span class="user-name">{{ authService.userName() }}</span>
+                <span class="user-role">Administrator</span>
+            </div>
+            }
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content" class="admin-content">
+        <router-outlet />
+    </main>
+</div>

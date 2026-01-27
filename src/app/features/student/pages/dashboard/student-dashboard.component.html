@@ -1,0 +1,63 @@
+<div class="dashboard">
+    <!-- Map Section -->
+    <section class="map-section">
+        <rx-map [center]="mapCenter()" [routes]="filteredRoutes()" [buses]="activeBuses()" [showOverlay]="true" />
+    </section>
+
+    <!-- Routes Section -->
+    <section class="routes-section">
+        <div class="section-header">
+            <h2 class="section-title">Bus Routes</h2>
+            <div class="filters">
+                <button class="filter-btn" [class.active]="filter() === 'all'" (click)="filter.set('all')">
+                    All
+                </button>
+                <button class="filter-btn" [class.active]="filter() === 'active'" (click)="filter.set('active')">
+                    <span class="live-dot"></span>
+                    Active
+                </button>
+                <button class="filter-btn" [class.active]="filter() === 'favorites'" (click)="filter.set('favorites')">
+                    <i class="pi pi-star-fill"></i>
+                    Favorites
+                </button>
+            </div>
+        </div>
+
+        <div class="routes-grid">
+            @for (route of filteredRoutes(); track route.id) {
+            <rx-route-card [route]="route" [bus]="getBusForRoute(route.id)" [isFavorite]="isFavorite(route.id)"
+                (cardClick)="onRouteClick($event)" (favoriteToggle)="onFavoriteToggle($event)" />
+            } @empty {
+            <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                @if (filter() === 'favorites') {
+                <p>No favorite routes yet</p>
+                <span>Star a route to add it to favorites</span>
+                } @else {
+                <p>No routes available</p>
+                }
+            </div>
+            }
+        </div>
+    </section>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+    <button class="nav-btn active">
+        <i class="pi pi-home"></i>
+        <span>Home</span>
+    </button>
+    <button class="nav-btn">
+        <i class="pi pi-map"></i>
+        <span>Map</span>
+    </button>
+    <button class="nav-btn">
+        <i class="pi pi-star"></i>
+        <span>Favorites</span>
+    </button>
+    <button class="nav-btn" (click)="authService.logout()">
+        <i class="pi pi-user"></i>
+        <span>Profile</span>
+    </button>
+</nav>

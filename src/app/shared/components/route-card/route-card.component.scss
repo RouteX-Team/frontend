@@ -1,0 +1,114 @@
+.route-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: var(--rx-surface);
+    border: 1px solid var(--rx-border-light);
+    border-radius: var(--rx-radius-lg);
+    cursor: pointer;
+    transition: all var(--rx-transition);
+}
+
+.route-card:hover {
+    border-color: var(--rx-primary-200);
+    box-shadow: var(--rx-shadow-md);
+}
+
+:host-context([data-theme="dark"]) .route-card:hover,
+:host-context(.dark) .route-card:hover {
+    border-color: var(--rx-primary-700);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.route-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--rx-radius);
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.route-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.route-name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rx-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.route-stops {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+}
+
+.favorite-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--rx-slate-400);
+    cursor: pointer;
+    transition: all var(--rx-transition-fast);
+}
+
+.favorite-btn:hover {
+    background-color: var(--rx-warning-50);
+    color: var(--rx-warning-500);
+}
+
+.favorite-btn.active {
+    color: var(--rx-warning-500);
+}
+
+.card-status {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rx-border-light);
+}
+
+.card-status.inactive {
+    opacity: 0.6;
+}
+
+.next-stop {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+    margin-left: auto;
+}
+
+.no-service {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+}

@@ -1,0 +1,60 @@
+<header class="header">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="header-content">
+        <!-- Logo & Brand -->
+        <div class="brand">
+            <a routerLink="/" class="brand-link">
+                <span class="brand-icon">🚌</span>
+                <span class="brand-name">RouteX</span>
+            </a>
+            @if (subtitle()) {
+            <span class="brand-subtitle">{{ subtitle() }}</span>
+            }
+        </div>
+
+        <!-- Right side controls -->
+        <div class="header-actions">
+            <!-- Theme Toggle -->
+            <button class="icon-btn" (click)="themeService.toggle()"
+                [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+                title="Toggle theme">
+                <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+            </button>
+
+            <!-- User Menu -->
+            @if (authService.isAuthenticated()) {
+            <div class="user-menu">
+                <button class="user-btn" (click)="toggleUserMenu()">
+                    @if (authService.userAvatar()) {
+                    <img [src]="authService.userAvatar()" [alt]="authService.userName()" class="user-avatar" />
+                    } @else {
+                    <span class="user-initials">{{ getInitials(authService.userName()) }}</span>
+                    }
+                    <span class="user-name">{{ authService.userName() }}</span>
+                    <i class="pi pi-chevron-down"></i>
+                </button>
+
+                @if (showUserMenu) {
+                <div class="user-dropdown">
+                    <div class="dropdown-header">
+                        <span class="dropdown-name">{{ authService.userName() }}</span>
+                        <span class="dropdown-role">{{ authService.role() | titlecase }}</span>
+                    </div>
+                    <hr class="dropdown-divider" />
+                    <button class="dropdown-item" (click)="onLogout()">
+                        <i class="pi pi-sign-out"></i>
+                        Sign Out
+                    </button>
+                </div>
+                }
+            </div>
+            } @else {
+            <a routerLink="/login" class="login-btn">
+                <i class="pi pi-sign-in"></i>
+                Login
+            </a>
+            }
+        </div>
+    </div>
+</header>

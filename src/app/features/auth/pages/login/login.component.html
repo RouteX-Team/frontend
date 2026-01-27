@@ -1,0 +1,94 @@
+<div class="login-page">
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" (click)="themeService.toggle()"
+        [attr.aria-label]="themeService.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+        <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
+
+    <div class="login-container">
+        <!-- Brand -->
+        <div class="brand">
+            <span class="brand-icon">🚌</span>
+            <h1 class="brand-name">RouteX</h1>
+            <p class="brand-tagline">University Bus Tracking System</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-form" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-wrapper">
+                    <i class="pi pi-envelope input-icon"></i>
+                    <input type="email" id="email" name="email" [(ngModel)]="email" class="form-input"
+                        placeholder="Enter your email" required autocomplete="email" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <i class="pi pi-lock input-icon"></i>
+                    <input [type]="showPassword() ? 'text' : 'password'" id="password" name="password"
+                        [(ngModel)]="password" class="form-input" placeholder="Enter your password" required
+                        autocomplete="current-password" />
+                    <button type="button" class="password-toggle" (click)="togglePassword()"
+                        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+                        <i [class]="showPassword() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                    </button>
+                </div>
+            </div>
+
+            @if (authService.error()) {
+            <div class="error-message">
+                <i class="pi pi-exclamation-circle"></i>
+                {{ authService.error() }}
+            </div>
+            }
+
+            <button type="submit" class="login-btn" [disabled]="authService.loading()">
+                @if (authService.loading()) {
+                <i class="pi pi-spinner pi-spin"></i>
+                Signing in...
+                } @else {
+                <i class="pi pi-sign-in"></i>
+                Sign In
+                }
+            </button>
+        </form>
+
+        <!-- Quick Access (Demo) -->
+        <div class="quick-access">
+            <p class="quick-access-label">Quick Demo Access:</p>
+            <div class="quick-access-buttons">
+                <button class="quick-btn student" (click)="quickLogin('student')" title="Login as Student">
+                    <i class="pi pi-user"></i>
+                    Student
+                </button>
+                <button class="quick-btn driver" (click)="quickLogin('driver')" title="Login as Driver">
+                    <i class="pi pi-car"></i>
+                    Driver
+                </button>
+                <button class="quick-btn admin" (click)="quickLogin('admin')" title="Login as Admin">
+                    <i class="pi pi-shield"></i>
+                    Admin
+                </button>
+            </div>
+        </div>
+
+        <!-- Demo Accounts Info -->
+        <details class="demo-info">
+            <summary>Demo Account Credentials</summary>
+            <div class="demo-accounts">
+                <div class="account">
+                    <strong>Admin:</strong> admin&#64;routex.edu / admin123
+                </div>
+                <div class="account">
+                    <strong>Driver:</strong> driver1&#64;routex.edu / driver123
+                </div>
+                <div class="account">
+                    <strong>Student:</strong> ahmed.ali&#64;student.routex.edu / student123
+                </div>
+            </div>
+        </details>
+    </div>
+</div>

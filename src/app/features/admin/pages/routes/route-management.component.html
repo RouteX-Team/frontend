@@ -1,0 +1,101 @@
+<div class="admin-page-container">
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Route Management</h1>
+            <p class="text-muted">Create and manage university bus routes</p>
+        </div>
+        <button pButton label="New Route" icon="pi pi-plus" (click)="openNew()"></button>
+    </header>
+
+    <div class="card">
+        <p-table [value]="routes()" [rows]="10" [paginator]="true" [globalFilterFields]="['name','shortCode']"
+            responsiveLayout="scroll" [rowHover]="true" dataKey="id">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="shortCode">Code <p-sortIcon field="shortCode"></p-sortIcon></th>
+                    <th pSortableColumn="name">Route Name <p-sortIcon field="name"></p-sortIcon></th>
+                    <th>Color</th>
+                    <th pSortableColumn="isActive">Status <p-sortIcon field="isActive"></p-sortIcon></th>
+                    <th>Stops</th>
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-route>
+                <tr>
+                    <td><span class="font-bold text-primary">{{ route.shortCode }}</span></td>
+                    <td>{{ route.name }}</td>
+                    <td>
+                        <div class="color-preview" [style.background-color]="route.color"></div>
+                    </td>
+                    <td>
+                        <span [class]="'status-badge ' + (route.isActive ? 'active' : 'inactive')">
+                            {{ route.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>{{ route.stops?.length || 0 }} Stops</td>
+                    <td>
+                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                            (click)="editRoute(route)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger"
+                            (click)="deleteRoute(route)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Edit/New Dialog -->
+    <p-dialog [(visible)]="routeDialog" [style]="{width: '500px'}" header="Route Details" [modal]="true"
+        styleClass="p-fluid">
+        <ng-template pTemplate="content">
+            <div class="field mb-4">
+                <label for="name">Route Name</label>
+                <input type="text" pInputText id="name" [(ngModel)]="currentRoute().name" required autofocus />
+                <small class="p-error" *ngIf="submitted() && !currentRoute().name">Name is required.</small>
+            </div>
+
+            <div class="grid flex">
+                <div class="field col-6 mr-2">
+                    <label for="code">Short Code</label>
+                    <input type="text" pInputText id="code" [(ngModel)]="currentRoute().shortCode" required />
+                    <small class="p-error" *ngIf="submitted() && !currentRoute().shortCode">Code is required.</small>
+                </div>
+                <div class="field col-6">
+                    <label for="color">Theme Color</label>
+                    <input type="color" pInputText id="color" [(ngModel)]="currentRoute().color" />
+                </div>
+            </div>
+
+            <div class="field mb-4">
+                <label for="description">Description (Optional)</label>
+                <textarea id="description" pInputTextarea [(ngModel)]="currentRoute().description" rows="3"></textarea>
+            </div>
+
+            <div class="grid flex">
+                <div class="field col-6 mr-2">
+                    <label for="freq">Frequency (min)</label>
+                    <p-inputNumber id="freq" [(ngModel)]="currentRoute().frequency"></p-inputNumber>
+                </div>
+                <div class="field col-6">
+                    <label for="dur">Duration (min)</label>
+                    <p-inputNumber id="dur" [(ngModel)]="currentRoute().estimatedDuration"></p-inputNumber>
+                </div>
+            </div>
+
+            <div class="field-checkbox mt-4 flex items-center gap-2">
+                <p-toggleSwitch [(ngModel)]="currentRoute().isActive" id="active"></p-toggleSwitch>
+                <label for="active">Active Status</label>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+            <button pButton label="Save" icon="pi pi-check" class="p-button-primary" (click)="saveRoute()"></button>
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+    <p-toast></p-toast>
+</div>

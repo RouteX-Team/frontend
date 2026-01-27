@@ -1,0 +1,133 @@
+:host {
+    display: inline-block;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* On Route - Green */
+.badge-on-route {
+    background-color: var(--rx-success-100);
+    color: var(--rx-success-700);
+}
+
+.dot-on-route {
+    background-color: var(--rx-success-500);
+}
+
+/* Arriving - Blue */
+.badge-arriving {
+    background-color: var(--rx-info-100);
+    color: var(--rx-info-600);
+}
+
+.dot-arriving {
+    background-color: var(--rx-info-500);
+}
+
+/* Delayed - Amber */
+.badge-delayed {
+    background-color: var(--rx-warning-100);
+    color: var(--rx-warning-700);
+}
+
+.dot-delayed {
+    background-color: var(--rx-warning-500);
+}
+
+/* Idle - Gray */
+.badge-idle {
+    background-color: var(--rx-slate-100);
+    color: var(--rx-slate-600);
+}
+
+.dot-idle {
+    background-color: var(--rx-slate-400);
+}
+
+/* Offline - Red */
+.badge-offline {
+    background-color: var(--rx-error-100);
+    color: var(--rx-error-600);
+}
+
+.dot-offline {
+    background-color: var(--rx-error-500);
+}
+
+/* Maintenance - Purple */
+.badge-maintenance {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+}
+
+.dot-maintenance {
+    background-color: #8b5cf6;
+}
+
+/* Dark mode overrides */
+:host-context([data-theme="dark"]) .badge-on-route,
+:host-context(.dark) .badge-on-route {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: var(--rx-success-400);
+}
+
+:host-context([data-theme="dark"]) .badge-arriving,
+:host-context(.dark) .badge-arriving {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+}
+
+:host-context([data-theme="dark"]) .badge-delayed,
+:host-context(.dark) .badge-delayed {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: var(--rx-warning-400);
+}
+
+:host-context([data-theme="dark"]) .badge-idle,
+:host-context(.dark) .badge-idle {
+    background-color: var(--rx-slate-800);
+    color: var(--rx-slate-400);
+}
+
+:host-context([data-theme="dark"]) .badge-offline,
+:host-context(.dark) .badge-offline {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+:host-context([data-theme="dark"]) .badge-maintenance,
+:host-context(.dark) .badge-maintenance {
+    background-color: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+}

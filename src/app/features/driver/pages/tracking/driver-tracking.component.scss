@@ -1,0 +1,281 @@
+.tracking-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--rx-bg);
+}
+
+/* Header */
+.driver-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--rx-surface);
+    border-bottom: 1px solid var(--rx-border-light);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-icon {
+    font-size: 1.5rem;
+}
+
+.brand-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--rx-primary-600);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--rx-border);
+    border-radius: var(--rx-radius);
+    background: transparent;
+    color: var(--rx-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--rx-transition-fast);
+}
+
+.logout-btn:hover {
+    background-color: var(--rx-error-50);
+    border-color: var(--rx-error-200);
+    color: var(--rx-error-600);
+}
+
+/* Content */
+.tracking-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Cards */
+.status-card,
+.location-card,
+.progress-card {
+    background-color: var(--rx-surface);
+    border: 1px solid var(--rx-border-light);
+    border-radius: var(--rx-radius-lg);
+    padding: 1.25rem;
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.status-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rx-text);
+}
+
+.route-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.route-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--rx-radius);
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.route-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-details strong {
+    color: var(--rx-text);
+}
+
+.route-details span {
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+}
+
+.no-route,
+.no-location {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    color: var(--rx-text-muted);
+    text-align: center;
+}
+
+.no-route i,
+.no-location i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.no-route p,
+.no-location p {
+    margin: 0;
+}
+
+/* Location Card */
+.location-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--rx-text);
+}
+
+.mini-map {
+    height: 180px;
+    margin-bottom: 1rem;
+    border-radius: var(--rx-radius);
+    overflow: hidden;
+    border: 1px solid var(--rx-border-light);
+}
+
+.location-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.coord {
+    display: flex;
+    flex-direction: column;
+}
+
+.coord .label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--rx-text-muted);
+}
+
+.coord .value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    color: var(--rx-text);
+}
+
+.location-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+}
+
+.location-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Tracking Control */
+.tracking-control {
+    margin-top: auto;
+}
+
+.control-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: none;
+    border-radius: var(--rx-radius-lg);
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--rx-transition-fast);
+}
+
+.control-btn i {
+    font-size: 1.5rem;
+}
+
+.control-btn.start {
+    background-color: var(--rx-success-600);
+    color: white;
+}
+
+.control-btn.start:hover:not(:disabled) {
+    background-color: var(--rx-success-700);
+}
+
+.control-btn.start:disabled {
+    background-color: var(--rx-slate-300);
+    cursor: not-allowed;
+}
+
+.control-btn.stop {
+    background-color: var(--rx-error-600);
+    color: white;
+}
+
+.control-btn.stop:hover {
+    background-color: var(--rx-error-700);
+}
+
+/* Progress Card */
+.progress-card h3 {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--rx-text);
+}
+
+.progress-bar {
+    height: 0.5rem;
+    background-color: var(--rx-slate-200);
+    border-radius: var(--rx-radius-full);
+    overflow: hidden;
+}
+
+:host-context([data-theme="dark"]) .progress-bar,
+:host-context(.dark) .progress-bar {
+    background-color: var(--rx-slate-700);
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--rx-success-500);
+    border-radius: var(--rx-radius-full);
+    transition: width 0.5s ease;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+}

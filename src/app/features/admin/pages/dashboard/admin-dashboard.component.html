@@ -1,0 +1,139 @@
+<div class="admin-dashboard">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, {{ authService.userName() }}</p>
+        </div>
+        <span class="last-updated">
+            <i class="pi pi-clock"></i>
+            Last updated: Just now
+        </span>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid">
+        @for (stat of stats(); track stat.label) {
+        <div class="stat-card" [style.--accent-color]="stat.color">
+            <div class="stat-icon">
+                <i [class]="'pi ' + stat.icon"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ stat.value }}</span>
+                <span class="stat-label">{{ stat.label }}</span>
+            </div>
+        </div>
+        }
+    </section>
+
+    <!-- Map Section -->
+    <section class="admin-map-section">
+        <div class="card">
+            <div class="card-header">
+                <h2>Live System Overview</h2>
+                <span class="active-count">
+                    <i class="pi pi-circle-fill" style="color: var(--rx-success-500); font-size: 0.5rem"></i>
+                    {{ activeBuses().length }} buses tracking
+                </span>
+            </div>
+            <div class="map-container">
+                <rx-map [center]="mapCenter()" [routes]="routes()" [buses]="activeBuses()" [showOverlay]="true" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="dashboard-grid">
+        <!-- Bus Status -->
+        <section class="card bus-status">
+            <div class="card-header">
+                <h2>Bus Status</h2>
+                <a routerLink="/admin/buses" class="view-all">View All</a>
+            </div>
+            <div class="bus-list">
+                @for (bus of buses(); track bus.id) {
+                <div class="bus-item">
+                    <div class="bus-info">
+                        <strong>{{ bus.name || bus.plateNumber }}</strong>
+                        <span>{{ bus.plateNumber }}</span>
+                    </div>
+                    <rx-status-badge [status]="bus.status" [showDot]="true" />
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Active Routes -->
+        <section class="card active-routes">
+            <div class="card-header">
+                <h2>Active Routes</h2>
+                <a routerLink="/admin/routes" class="view-all">View All</a>
+            </div>
+            <div class="route-list">
+                @for (route of activeRoutes(); track route.id) {
+                <div class="route-item">
+                    <div class="route-badge" [style.background-color]="route.color">
+                        {{ route.shortCode }}
+                    </div>
+                    <div class="route-info">
+                        <strong>{{ route.name }}</strong>
+                        <span>{{ route.stops.length }} stops</span>
+                    </div>
+                    <span class="route-status">
+                        @if (route.assignedDriverId) {
+                        <i class="pi pi-check-circle" style="color: var(--rx-success-500)"></i>
+                        } @else {
+                        <i class="pi pi-exclamation-circle" style="color: var(--rx-warning-500)"></i>
+                        }
+                    </span>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="card activity">
+            <div class="card-header">
+                <h2>Recent Activity</h2>
+            </div>
+            <div class="activity-list">
+                @for (activity of recentActivity; track $index) {
+                <div class="activity-item">
+                    <div class="activity-icon" [class]="activity.type">
+                        <i [class]="'pi ' + activity.icon"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p>{{ activity.message }}</p>
+                        <span>{{ activity.time }}</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="card quick-actions">
+            <div class="card-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="actions-grid">
+                <button class="action-btn" routerLink="/admin/routes">
+                    <i class="pi pi-plus"></i>
+                    Add Route
+                </button>
+                <button class="action-btn" routerLink="/admin/drivers">
+                    <i class="pi pi-user-plus"></i>
+                    Add Driver
+                </button>
+                <button class="action-btn" routerLink="/admin/assignments">
+                    <i class="pi pi-link"></i>
+                    Assign Driver
+                </button>
+                <button class="action-btn">
+                    <i class="pi pi-file-export"></i>
+                    Export Report
+                </button>
+            </div>
+        </section>
+    </div>
+</div>

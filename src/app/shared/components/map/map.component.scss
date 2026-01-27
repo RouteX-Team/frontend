@@ -1,0 +1,100 @@
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    border-radius: var(--rx-radius-lg);
+    overflow: hidden;
+    background-color: var(--rx-slate-100);
+    border: 1px solid var(--rx-border-light);
+}
+
+:host-context([data-theme="dark"]) .map-wrapper,
+:host-context(.dark) .map-wrapper {
+    background-color: var(--rx-slate-900);
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.map-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.overlay-card {
+    background-color: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-radius: var(--rx-radius);
+    padding: 0.75rem;
+    box-shadow: var(--rx-shadow-md);
+    pointer-events: auto;
+    min-width: 150px;
+}
+
+.overlay-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--rx-text);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rx-border-light);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--rx-text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot.primary {
+    background-color: var(--rx-primary-500);
+}
+
+.dot.success {
+    background-color: var(--rx-success-500);
+}
+
+/* Leaflet Customizations */
+::ng-deep {
+    .leaflet-container {
+        background-color: transparent !important;
+    }
+
+    .leaflet-bar {
+        border: 1px solid var(--rx-border) !important;
+        box-shadow: var(--rx-shadow) !important;
+    }
+
+    .leaflet-bar a {
+        background-color: var(--rx-surface) !important;
+        color: var(--rx-text) !important;
+        border-bottom: 1px solid var(--rx-border) !important;
+    }
+
+    .leaflet-bar a:hover {
+        background-color: var(--rx-slate-50) !important;
+    }
+
+    .dark .leaflet-bar a:hover {
+        background-color: var(--rx-slate-800) !important;
+    }
+}

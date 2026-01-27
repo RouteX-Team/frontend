@@ -1,0 +1,25 @@
+<div class="map-wrapper">
+    <div #mapContainer class="map-container"></div>
+
+    <!-- Map Legend/Overlay (Optional) -->
+    @if (showOverlay()) {
+    <div class="map-overlay">
+        <div class="overlay-card">
+            <div class="overlay-header">
+                <i class="pi pi-info-circle"></i>
+                <span>Live Campus Map</span>
+            </div>
+            <div class="overlay-body">
+                <div class="legend-item">
+                    <span class="dot primary"></span>
+                    <span>Bus Routes</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot success"></span>
+                    <span>Active Buses</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>

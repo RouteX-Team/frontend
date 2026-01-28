@@ -1,8 +1,45 @@
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
 .dashboard {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    padding-bottom: 70px;
+    padding-bottom: 80px;
+}
+
+/* Stats Bar */
+.stats-bar {
+    display: flex;
+    justify-content: space-around;
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-radius: 1rem;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--rx-primary-600);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--rx-text-muted);
+    margin-top: 0.25rem;
 }
 
 /* Map Section */
@@ -103,6 +140,15 @@
     background-color: var(--rx-primary-50);
     border-color: var(--rx-primary-200);
     color: var(--rx-primary-600);
+}
+
+.filter-badge {
+    background: var(--rx-primary-500);
+    color: white;
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 10px;
+    margin-left: 0.25rem;
 }
 
 :host-context([data-theme="dark"]) .filter-btn.active,

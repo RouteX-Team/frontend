@@ -1,0 +1,71 @@
+::ng-deep .confirm-dialog {
+    .p-dialog-header {
+        padding-bottom: 0.5rem;
+    }
+
+    .p-dialog-content {
+        padding-top: 0.5rem;
+    }
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.icon-container {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    i {
+        font-size: 1.75rem;
+    }
+
+    &.severity-danger {
+        background: var(--rx-error-50);
+        color: var(--rx-error-500);
+    }
+
+    &.severity-warning {
+        background: var(--rx-warning-50);
+        color: var(--rx-warning-500);
+    }
+
+    &.severity-info {
+        background: var(--rx-info-50);
+        color: var(--rx-info-500);
+    }
+}
+
+.message {
+    margin: 0;
+    color: var(--rx-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 300px;
+}
+
+// Dark mode adjustments
+[data-theme="dark"] {
+    .icon-container {
+        &.severity-danger {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        &.severity-warning {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        &.severity-info {
+            background: rgba(59, 130, 246, 0.15);
+        }
+    }
+}

@@ -52,6 +52,10 @@ export class TrackingService implements OnDestroy {
     private busLocations = signal<Map<string, GeoLocation>>(new Map());
     readonly allBusLocations = this.busLocations.asReadonly();
 
+    // Bus headings for map display
+    private _busHeadings = signal<Map<string, number>>(new Map());
+    readonly busHeadings = this._busHeadings.asReadonly();
+
     /**
      * Start tracking for a driver on a specific route
      */
@@ -163,6 +167,12 @@ export class TrackingService implements OnDestroy {
                 newMap.set(busId, currentStop.location);
                 return newMap;
             });
+
+            this._busHeadings.update(map => {
+                const newMap = new Map(map);
+                newMap.set(busId, heading);
+                return newMap;
+            });
         }
     }
 
@@ -195,6 +205,42 @@ export class TrackingService implements OnDestroy {
         });
 
         this.busLocations.set(locations);
+    }
+
+    /**
+     * Simulate movement for all buses (for student view)
+     * This randomly updates bus positions to simulate real-time tracking
+     */
+    simulateAllBusMovement(): void {
+        const currentLocations = this.busLocations();
+        const newLocations = new Map<string, GeoLocation>();
+        const newHeadings = new Map<string, number>();
+
+        MOCK_BUSES.forEach(bus => {
+            if (bus.currentRouteId && bus.status !== 'offline' && bus.status !== 'maintenance') {
+                const route = getRouteById(bus.currentRouteId);
+                if (route && route.stops.length > 0) {
+                    // Pick a random stop location for simulation
+                    const randomIndex = Math.floor(Math.random() * route.stops.length);
+                    const stop = route.stops[randomIndex];
+
+                    // Add slight random variation
+                    const lat = stop.location.lat + (Math.random() - 0.5) * 0.001;
+                    const lng = stop.location.lng + (Math.random() - 0.5) * 0.001;
+
+                    newLocations.set(bus.id, { lat, lng });
+
+                    // Calculate heading to next stop
+                    const nextIndex = (randomIndex + 1) % route.stops.length;
+                    const nextStop = route.stops[nextIndex];
+                    const heading = this.calculateHeading(stop.location, nextStop.location);
+                    newHeadings.set(bus.id, heading);
+                }
+            }
+        });
+
+        this.busLocations.set(newLocations);
+        this._busHeadings.set(newHeadings);
     }
 
     ngOnDestroy(): void {

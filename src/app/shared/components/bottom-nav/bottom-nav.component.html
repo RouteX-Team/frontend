@@ -1,0 +1,26 @@
+<nav class="bottom-nav">
+    @for (item of items(); track item.id) {
+        @if (item.route) {
+            <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.route === '/' }">
+                <span class="nav-icon">
+                    <i [class]="'pi ' + item.icon"></i>
+                    @if (item.badge && item.badge > 0) {
+                        <span class="badge">{{ item.badge > 9 ? '9+' : item.badge }}</span>
+                    }
+                </span>
+                <span class="nav-label">{{ item.label }}</span>
+            </a>
+        } @else {
+            <button class="nav-item" [class.active]="isActive(item)" (click)="onItemClick(item)">
+                <span class="nav-icon">
+                    <i [class]="'pi ' + item.icon"></i>
+                    @if (item.badge && item.badge > 0) {
+                        <span class="badge">{{ item.badge > 9 ? '9+' : item.badge }}</span>
+                    }
+                </span>
+                <span class="nav-label">{{ item.label }}</span>
+            </button>
+        }
+    }
+</nav>

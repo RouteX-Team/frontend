@@ -5,14 +5,25 @@
 import { Component, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService, TrackingService } from '../../../../core/services';
-import { StatusBadgeComponent, MapComponent } from '../../../../shared/components';
+import {
+    StatusBadgeComponent,
+    MapComponent
+} from '../../../../shared/components';
+import { EtaPipe, DurationPipe, TimeAgoPipe } from '../../../../shared/pipes';
 import { getRouteById } from '../../../../data/mock';
-import { Route, BusStatus, GeoLocation } from '../../../../data/models';
+import { Route, BusStatus, GeoLocation, Stop } from '../../../../data/models';
 
 @Component({
     selector: 'rx-driver-tracking',
     standalone: true,
-    imports: [CommonModule, StatusBadgeComponent, MapComponent],
+    imports: [
+        CommonModule,
+        StatusBadgeComponent,
+        MapComponent,
+        EtaPipe,
+        DurationPipe,
+        TimeAgoPipe
+    ],
     templateUrl: './driver-tracking.component.html',
     styleUrl: './driver-tracking.component.scss'
 })
@@ -21,6 +32,8 @@ export class DriverTrackingComponent implements OnDestroy {
     trackingService = inject(TrackingService);
 
     mapCenter = signal<GeoLocation>({ lat: 33.6844, lng: 73.0479 });
+    elapsedMinutes = signal(0);
+    private elapsedInterval: ReturnType<typeof setInterval> | null = null;
 
     // Computed for map view
     activeBusesForMap = computed(() => {
@@ -57,14 +70,47 @@ export class DriverTrackingComponent implements OnDestroy {
 
     progressPercent = signal(0);
 
+    // Computed: current stop index
+    currentStopIndex = computed(() => {
+        const route = this.assignedRoute();
+        const state = this.trackingService.state();
+        if (!route || !state.nextStopId) return 0;
+
+        const nextIndex = route.stops.findIndex(s => s.id === state.nextStopId);
+        return nextIndex > 0 ? nextIndex - 1 : 0;
+    });
+
+    // Computed: stops with progress info
+    stopsWithProgress = computed(() => {
+        const route = this.assignedRoute();
+        if (!route) return [];
+
+        const currentIdx = this.currentStopIndex();
+        return route.stops.map((stop, index) => ({
+            ...stop,
+            isPassed: index < currentIdx,
+            isCurrent: index === currentIdx,
+            isNext: index === currentIdx + 1,
+            etaMinutes: (index - currentIdx) * 2
+        }));
+    });
+
+    // Computed: completed stops count
+    completedStops = computed(() => {
+        return this.stopsWithProgress().filter(s => s.isPassed).length;
+    });
+
+    // Computed: remaining time estimate
+    remainingMinutes = computed(() => {
+        const route = this.assignedRoute();
+        if (!route) return 0;
+        const remaining = route.stops.length - this.currentStopIndex() - 1;
+        return remaining * 2; // 2 minutes per stop
+    });
+
     lastUpdated = computed(() => {
         const state = this.trackingService.state();
-        if (!state.lastUpdated) return 'Never';
-
-        const seconds = Math.floor((Date.now() - state.lastUpdated.getTime()) / 1000);
-        if (seconds < 5) return 'Just now';
-        if (seconds < 60) return `${seconds}s ago`;
-        return `${Math.floor(seconds / 60)}m ago`;
+        return state.lastUpdated;
     });
 
     nextStop = computed(() => {
@@ -82,11 +128,23 @@ export class DriverTrackingComponent implements OnDestroy {
 
         this.trackingService.startTracking(user.assignedRouteId, user.assignedBusId);
         this.simulateProgress();
+
+        // Start elapsed time counter
+        this.elapsedMinutes.set(0);
+        this.elapsedInterval = setInterval(() => {
+            this.elapsedMinutes.update(m => m + 1);
+        }, 60000);
     }
 
     stopTracking(): void {
         this.trackingService.stopTracking();
         this.progressPercent.set(0);
+        this.elapsedMinutes.set(0);
+
+        if (this.elapsedInterval) {
+            clearInterval(this.elapsedInterval);
+            this.elapsedInterval = null;
+        }
     }
 
     private simulateProgress(): void {
@@ -105,5 +163,8 @@ export class DriverTrackingComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.trackingService.stopTracking();
+        if (this.elapsedInterval) {
+            clearInterval(this.elapsedInterval);
+        }
     }
 }

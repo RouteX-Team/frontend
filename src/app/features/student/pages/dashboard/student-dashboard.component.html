@@ -1,63 +1,68 @@
-<div class="dashboard">
-    <!-- Map Section -->
-    <section class="map-section">
-        <rx-map [center]="mapCenter()" [routes]="filteredRoutes()" [buses]="activeBuses()" [showOverlay]="true" />
-    </section>
-
-    <!-- Routes Section -->
-    <section class="routes-section">
-        <div class="section-header">
-            <h2 class="section-title">Bus Routes</h2>
-            <div class="filters">
-                <button class="filter-btn" [class.active]="filter() === 'all'" (click)="filter.set('all')">
-                    All
-                </button>
-                <button class="filter-btn" [class.active]="filter() === 'active'" (click)="filter.set('active')">
-                    <span class="live-dot"></span>
-                    Active
-                </button>
-                <button class="filter-btn" [class.active]="filter() === 'favorites'" (click)="filter.set('favorites')">
-                    <i class="pi pi-star-fill"></i>
-                    Favorites
-                </button>
+@if (isLoading()) {
+    <div class="loading-container">
+        <rx-loading-spinner size="lg" label="Loading routes..." />
+    </div>
+} @else {
+    <div class="dashboard">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value">{{ activeRoutesCount() }}</span>
+                <span class="stat-label">Active Routes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ activeBusesCount() }}</span>
+                <span class="stat-label">Buses Running</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ favoritesCount() }}</span>
+                <span class="stat-label">Favorites</span>
             </div>
         </div>
 
-        <div class="routes-grid">
-            @for (route of filteredRoutes(); track route.id) {
-            <rx-route-card [route]="route" [bus]="getBusForRoute(route.id)" [isFavorite]="isFavorite(route.id)"
-                (cardClick)="onRouteClick($event)" (favoriteToggle)="onFavoriteToggle($event)" />
-            } @empty {
-            <div class="empty-state">
-                <i class="pi pi-inbox"></i>
-                @if (filter() === 'favorites') {
-                <p>No favorite routes yet</p>
-                <span>Star a route to add it to favorites</span>
-                } @else {
-                <p>No routes available</p>
+        <!-- Map Section -->
+        <section class="map-section">
+            <rx-map [center]="mapCenter()" [routes]="filteredRoutes()" [buses]="activeBuses()" [showOverlay]="true" />
+        </section>
+
+        <!-- Routes Section -->
+        <section class="routes-section">
+            <div class="section-header">
+                <h2 class="section-title">Bus Routes</h2>
+                <div class="filters">
+                    <button class="filter-btn" [class.active]="filter() === 'all'" (click)="filter.set('all')">
+                        All
+                    </button>
+                    <button class="filter-btn" [class.active]="filter() === 'active'" (click)="filter.set('active')">
+                        <span class="live-dot"></span>
+                        Active
+                    </button>
+                    <button class="filter-btn" [class.active]="filter() === 'favorites'" (click)="filter.set('favorites')">
+                        <i class="pi pi-star-fill"></i>
+                        Favorites
+                        @if (favoritesCount() > 0) {
+                            <span class="filter-badge">{{ favoritesCount() }}</span>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <div class="routes-grid">
+                @for (route of filteredRoutes(); track route.id) {
+                    <rx-route-card [route]="route" [bus]="getBusForRoute(route.id)" [isFavorite]="isFavorite(route.id)"
+                        (cardClick)="onRouteClick($event)" (favoriteToggle)="onFavoriteToggle($event)" />
+                } @empty {
+                    <rx-empty-state
+                        [icon]="filter() === 'favorites' ? 'pi-star' : 'pi-inbox'"
+                        [title]="filter() === 'favorites' ? 'No favorite routes yet' : 'No routes available'"
+                        [message]="filter() === 'favorites' ? 'Star a route to add it to your favorites' : 'Check back later for available routes'"
+                        size="md">
+                    </rx-empty-state>
                 }
             </div>
-            }
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+}
 
-<!-- Bottom Navigation slot for MainLayout -->
-<nav class="bottom-nav" bottomNav>
-    <button class="nav-btn" [class.active]="true" (click)="filter.set('all')">
-        <i class="pi pi-home"></i>
-        <span>Home</span>
-    </button>
-    <button class="nav-btn" (click)="filter.set('all')">
-        <i class="pi pi-map"></i>
-        <span>Map</span>
-    </button>
-    <button class="nav-btn" (click)="filter.set('favorites')">
-        <i class="pi pi-star"></i>
-        <span>Favorites</span>
-    </button>
-    <button class="nav-btn" (click)="authService.logout()">
-        <i class="pi pi-sign-out"></i>
-        <span>Logout</span>
-    </button>
-</nav>
+<!-- Bottom Navigation -->
+<rx-bottom-nav [items]="navItems" [activeId]="activeNavItem()" (itemClick)="onNavClick($event)" />

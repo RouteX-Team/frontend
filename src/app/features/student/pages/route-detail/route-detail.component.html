@@ -1,3 +1,8 @@
+@if (loading()) {
+<div class="loading-container">
+    <rx-loading-spinner size="lg" label="Loading route..."></rx-loading-spinner>
+</div>
+} @else {
 <div class="route-detail-container">
     <!-- Header -->
     <header class="detail-header">
@@ -13,6 +18,23 @@
         </button>
     </header>
 
+    <!-- Progress Bar -->
+    @if (activeBus()) {
+    <div class="progress-section">
+        <div class="progress-info">
+            <span class="progress-label">Route Progress</span>
+            <span class="progress-value">{{ completedStops() }}/{{ stopsWithStats().length }} stops</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+        </div>
+        <div class="last-update">
+            <i class="pi pi-sync"></i>
+            <span>Updated {{ lastUpdated() | timeAgo }}</span>
+        </div>
+    </div>
+    }
+
     <div class="content-grid">
         <!-- Map Section -->
         <section class="map-section">
@@ -23,11 +45,19 @@
             @if (activeBus()) {
             <div class="bus-status-float">
                 <div class="bus-info">
-                    <i class="pi pi-truck bus-icon"></i>
+                    <rx-bus-marker
+                        [status]="activeBus()?.status || 'offline'"
+                        [heading]="busHeading()"
+                        [animated]="true">
+                    </rx-bus-marker>
                     <div class="info">
                         <span class="plate">{{ activeBus()?.plateNumber }}</span>
                         <rx-status-badge [status]='activeBus()?.status || "offline"'></rx-status-badge>
                     </div>
+                </div>
+                <div class="bus-eta">
+                    <i class="pi pi-clock"></i>
+                    <span>Next stop in {{ stopsWithStats()[completedStops()]?.etaMinutes | eta }}</span>
                 </div>
             </div>
             }
@@ -42,42 +72,53 @@
 
             <div class="stops-timeline">
                 @for (stop of stopsWithStats(); track $index; let i = $index) {
-                <div class="stop-item">
+                <div class="stop-item" [class.passed]="stop.isPassed" [class.next]="stop.isNext">
                     <div class="timeline-indicator">
-                        <div class="dot" [class.main]='stop.isMainStop'></div>
-                        @if (i < (stopsWithStats().length || 0) - 1) { <div class="line">
+                        <div class="dot" [class.main]='stop.isMainStop' [class.passed]="stop.isPassed" [class.next]="stop.isNext">
+                            @if (stop.isPassed) {
+                            <i class="pi pi-check"></i>
+                            }
+                        </div>
+                        @if (i < (stopsWithStats().length || 0) - 1) {
+                        <div class="line" [class.passed]="stop.isPassed"></div>
+                        }
                     </div>
-                    }
+                    <div class="stop-details">
+                        <div class="stop-info">
+                            <h3>{{ stop.name }}</h3>
+                            @if (stop.isNext) {
+                            <span class="next-badge">Next Stop</span>
+                            }
+                        </div>
+                        <div class="stop-stats">
+                            @if (!stop.isPassed) {
+                            <span class="eta">{{ stop.etaMinutes | eta }}</span>
+                            <span class="dist text-muted">{{ stop.distanceMeters | distance }}</span>
+                            } @else {
+                            <span class="completed-text">Completed</span>
+                            }
+                        </div>
+                    </div>
                 </div>
-                <div class="stop-details">
-                    <div class="stop-info">
-                        <h3>{{ stop.name }}</h3>
+                }
+            </div>
+
+            @if (currentRoute()) {
+            <div class="route-info-card">
+                <p class="description">{{ currentRoute()?.description }}</p>
+                <div class="info-footer">
+                    <div class="info-item">
+                        <i class="pi pi-clock"></i>
+                        <span>Frequency: {{ currentRoute()?.frequency }} min</span>
                     </div>
-                    <div class="stop-stats">
-                        <span class="eta">{{ stop.eta }}</span>
-                        <span class="dist text-muted">{{ stop.distance }}</span>
+                    <div class="info-item">
+                        <i class="pi pi-calendar"></i>
+                        <span>{{ currentRoute()?.operatingHours?.start }} - {{ currentRoute()?.operatingHours?.end }}</span>
                     </div>
                 </div>
             </div>
             }
+        </section>
     </div>
-
-    @if (currentRoute()) {
-    <div class="route-info-card">
-        <p class="description">{{ currentRoute()?.description }}</p>
-        <div class="info-footer">
-            <div class="info-item">
-                <i class="pi pi-clock"></i>
-                <span>Frequency: {{ currentRoute()?.frequency }} min</span>
-            </div>
-            <div class="info-item">
-                <i class="pi pi-calendar"></i>
-                <span>{{ currentRoute()?.operatingHours?.start }} - {{ currentRoute()?.operatingHours?.end
-                    }}</span>
-            </div>
-        </div>
-    </div>
-    }
-    </section>
 </div>
-</div>
+}

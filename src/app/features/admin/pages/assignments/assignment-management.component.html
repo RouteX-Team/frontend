@@ -4,6 +4,7 @@
             <h1>Route Assignments</h1>
             <p class="text-muted">Assign drivers and buses to routes</p>
         </div>
+        <button pButton label="New Assignment" icon="pi pi-plus" (click)="openNew()"></button>
     </header>
 
     <!-- Stats Cards -->
@@ -139,7 +140,7 @@
                     </td>
                     <td>
                         <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info mr-2"
-                            (click)="openAssignDialog(assignment.route)" pTooltip="Edit Assignment"></button>
+                            (click)="editAssignment(assignment.route)" pTooltip="Edit Assignment"></button>
                         @if (assignment.driver || assignment.bus) {
                             <button pButton icon="pi pi-times" class="p-button-rounded p-button-warning"
                                 (click)="clearAssignment(assignment)" pTooltip="Clear Assignment"></button>
@@ -158,77 +159,6 @@
             </ng-template>
         </p-table>
     </div>
-
-    <!-- Assignment Dialog -->
-    <p-dialog [(visible)]="assignDialog" [style]="{width: '500px'}" header="Edit Assignment" [modal]="true"
-        styleClass="p-fluid">
-        <ng-template pTemplate="content">
-            @if (currentRoute()) {
-                <div class="current-route-info">
-                    <span class="route-code-large" [style.background-color]="currentRoute()!.color + '20'"
-                        [style.color]="currentRoute()!.color">
-                        {{ currentRoute()!.shortCode }}
-                    </span>
-                    <div>
-                        <h3>{{ currentRoute()!.name }}</h3>
-                        <p class="text-muted">{{ currentRoute()!.stops.length }} stops ·
-                            {{ currentRoute()!.estimatedDuration }} min duration</p>
-                    </div>
-                </div>
-
-                <p-divider></p-divider>
-
-                <div class="field mb-4">
-                    <label for="driver">
-                        <i class="pi pi-user mr-2"></i>
-                        Assign Driver
-                    </label>
-                    <p-select id="driver" [options]="availableDrivers()" [(ngModel)]="selectedDriverId"
-                        optionLabel="name" optionValue="id" placeholder="Select a driver"
-                        [showClear]="true" styleClass="w-full">
-                        <ng-template pTemplate="item" let-driver>
-                            <div class="flex items-center gap-2">
-                                <span class="avatar-small">{{ driver.name.charAt(0) }}</span>
-                                <div>
-                                    <div>{{ driver.name }}</div>
-                                    <small class="text-muted">{{ driver.email }}</small>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </p-select>
-                </div>
-
-                <div class="field">
-                    <label for="bus">
-                        <i class="pi pi-truck mr-2"></i>
-                        Assign Bus
-                    </label>
-                    <p-select id="bus" [options]="availableBuses()" [(ngModel)]="selectedBusId"
-                        optionLabel="name" optionValue="id" placeholder="Select a bus"
-                        [showClear]="true" styleClass="w-full">
-                        <ng-template pTemplate="item" let-bus>
-                            <div class="flex items-center gap-2">
-                                <span class="bus-icon-small">
-                                    <i class="pi pi-truck"></i>
-                                </span>
-                                <div>
-                                    <div>{{ bus.name || bus.plateNumber }}</div>
-                                    <small class="text-muted">{{ bus.plateNumber }} · {{ bus.capacity }} seats</small>
-                                </div>
-                            </div>
-                        </ng-template>
-                    </p-select>
-                </div>
-            }
-        </ng-template>
-
-        <ng-template pTemplate="footer">
-            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text"
-                (click)="assignDialog.set(false)"></button>
-            <button pButton label="Save Assignment" icon="pi pi-check" class="p-button-primary"
-                (click)="saveAssignment()"></button>
-        </ng-template>
-    </p-dialog>
 
     <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
     <p-toast></p-toast>

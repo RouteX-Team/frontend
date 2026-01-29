@@ -1,0 +1,123 @@
+<p-toast />
+
+<div class="form-page">
+    <div class="page-header">
+        <div class="header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" (click)="onCancel()" />
+            <h1>{{ isEditMode() ? 'Edit Assignment' : 'Create Assignment' }}</h1>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-content">
+            <!-- Route Selection -->
+            <div class="form-section">
+                <h3><i class="pi pi-map"></i> Select Route</h3>
+
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="route">Route <span class="required">*</span></label>
+                        @if (isEditMode()) {
+                            <div class="selected-route">
+                                <div class="route-color" [style.background-color]="currentRoute()?.color"></div>
+                                <div class="route-info">
+                                    <span class="route-name">{{ currentRoute()?.name }}</span>
+                                    <span class="route-code">{{ currentRoute()?.shortCode }}</span>
+                                </div>
+                            </div>
+                        } @else {
+                            <p-select id="route"
+                                      [ngModel]="routeId()"
+                                      (ngModelChange)="onRouteChange($event)"
+                                      [options]="routes()"
+                                      optionLabel="name"
+                                      optionValue="id"
+                                      placeholder="Select a route" />
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Assignment -->
+            <div class="form-section">
+                <h3><i class="pi pi-user"></i> Assign Driver</h3>
+
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="driver">Driver</label>
+                        <p-select id="driver"
+                                  [(ngModel)]="selectedDriverId"
+                                  [options]="availableDrivers()"
+                                  optionLabel="name"
+                                  optionValue="id"
+                                  placeholder="Select a driver (optional)"
+                                  [showClear]="true">
+                            <ng-template pTemplate="selectedItem" let-driver>
+                                @if (driver) {
+                                    <div class="driver-option">
+                                        <i class="pi pi-user"></i>
+                                        <span>{{ driver.name }}</span>
+                                    </div>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="item" let-driver>
+                                <div class="driver-option">
+                                    <i class="pi pi-user"></i>
+                                    <div>
+                                        <span>{{ driver.name }}</span>
+                                        <small class="text-muted">{{ driver.email }}</small>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bus Assignment -->
+            <div class="form-section">
+                <h3><i class="pi pi-truck"></i> Assign Bus</h3>
+
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="bus">Bus</label>
+                        <p-select id="bus"
+                                  [(ngModel)]="selectedBusId"
+                                  [options]="availableBuses()"
+                                  optionLabel="name"
+                                  optionValue="id"
+                                  placeholder="Select a bus (optional)"
+                                  [showClear]="true">
+                            <ng-template pTemplate="selectedItem" let-bus>
+                                @if (bus) {
+                                    <div class="bus-option">
+                                        <i class="pi pi-truck"></i>
+                                        <span>{{ bus.name || bus.plateNumber }}</span>
+                                    </div>
+                                }
+                            </ng-template>
+                            <ng-template pTemplate="item" let-bus>
+                                <div class="bus-option">
+                                    <i class="pi pi-truck"></i>
+                                    <div>
+                                        <span>{{ bus.name || bus.plateNumber }}</span>
+                                        <small class="text-muted">{{ bus.plateNumber }} • {{ bus.capacity }} seats</small>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="onCancel()" />
+            <p-button [label]="isEditMode() ? 'Update Assignment' : 'Create Assignment'"
+                      icon="pi pi-check"
+                      [loading]="loading()"
+                      [disabled]="!currentRoute()"
+                      (click)="onSubmit()" />
+        </div>
+    </div>
+</div>

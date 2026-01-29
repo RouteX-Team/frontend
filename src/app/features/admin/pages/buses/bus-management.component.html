@@ -127,68 +127,6 @@
         </p-table>
     </div>
 
-    <!-- Edit/New Dialog -->
-    <p-dialog [(visible)]="busDialog" [style]="{width: '500px'}" header="Bus Details" [modal]="true"
-        styleClass="p-fluid">
-        <ng-template pTemplate="content">
-            <div class="form-grid">
-                <div class="field">
-                    <label for="plateNumber">Plate Number *</label>
-                    <input type="text" pInputText id="plateNumber" [(ngModel)]="currentBus().plateNumber"
-                        required autofocus placeholder="e.g., RXB-1234" />
-                    @if (submitted() && !currentBus().plateNumber) {
-                        <small class="p-error">Plate number is required.</small>
-                    }
-                </div>
-
-                <div class="field">
-                    <label for="name">Bus Name</label>
-                    <input type="text" pInputText id="name" [(ngModel)]="currentBus().name"
-                        placeholder="e.g., Campus Cruiser" />
-                </div>
-
-                <div class="field">
-                    <label for="model">Model</label>
-                    <input type="text" pInputText id="model" [(ngModel)]="currentBus().model"
-                        placeholder="e.g., Toyota Coaster" />
-                </div>
-
-                <div class="field">
-                    <label for="year">Year</label>
-                    <p-inputNumber id="year" [(ngModel)]="currentBus().year" [useGrouping]="false"
-                        [min]="2000" [max]="2030"></p-inputNumber>
-                </div>
-
-                <div class="field">
-                    <label for="capacity">Capacity *</label>
-                    <p-inputNumber id="capacity" [(ngModel)]="currentBus().capacity"
-                        [min]="10" [max]="100" suffix=" seats"></p-inputNumber>
-                    @if (submitted() && !currentBus().capacity) {
-                        <small class="p-error">Capacity is required.</small>
-                    }
-                </div>
-
-                <div class="field">
-                    <label for="status">Status</label>
-                    <p-select id="status" [options]="statusOptions" [(ngModel)]="currentBus().status"
-                        optionLabel="label" optionValue="value" placeholder="Select Status"></p-select>
-                </div>
-
-                <div class="field">
-                    <label for="fuelLevel">Fuel Level</label>
-                    <p-inputNumber id="fuelLevel" [(ngModel)]="currentBus().fuelLevel"
-                        [min]="0" [max]="100" suffix="%"></p-inputNumber>
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template pTemplate="footer">
-            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text"
-                (click)="busDialog.set(false)"></button>
-            <button pButton label="Save" icon="pi pi-check" class="p-button-primary" (click)="saveBus()"></button>
-        </ng-template>
-    </p-dialog>
-
     <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
     <p-toast></p-toast>
 </div>

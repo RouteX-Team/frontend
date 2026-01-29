@@ -1,0 +1,76 @@
+<p-toast />
+
+<div class="form-page">
+    <div class="page-header">
+        <div class="header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" (click)="onCancel()" />
+            <h1>{{ isEditMode() ? 'Edit Student' : 'Add New Student' }}</h1>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-content">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h3><i class="pi pi-user"></i> Personal Information</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="name">Full Name <span class="required">*</span></label>
+                        <input id="name" type="text" pInputText
+                               [(ngModel)]="student().name"
+                               [class.ng-invalid]="submitted() && !student().name"
+                               placeholder="e.g., Jane Doe" />
+                        @if (submitted() && !student().name) {
+                            <small class="error-text">Name is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input id="email" type="email" pInputText
+                               [(ngModel)]="student().email"
+                               [class.ng-invalid]="submitted() && !student().email"
+                               placeholder="e.g., jane.doe@university.edu" />
+                        @if (submitted() && !student().email) {
+                            <small class="error-text">Email is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" type="tel" pInputText
+                               [(ngModel)]="student().phone"
+                               placeholder="e.g., +1 234 567 8900" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Route Preferences -->
+            <div class="form-section">
+                <h3><i class="pi pi-star"></i> Favorite Routes</h3>
+
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="routes">Preferred Routes</label>
+                        <p-multiSelect id="routes"
+                                       [(ngModel)]="student().favoriteRouteIds"
+                                       [options]="routes()"
+                                       optionLabel="name"
+                                       optionValue="id"
+                                       placeholder="Select favorite routes"
+                                       display="chip" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="onCancel()" />
+            <p-button [label]="isEditMode() ? 'Update Student' : 'Add Student'"
+                      icon="pi pi-check"
+                      [loading]="loading()"
+                      (click)="onSubmit()" />
+        </div>
+    </div>
+</div>

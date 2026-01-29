@@ -16,5 +16,4 @@ import { HeaderComponent } from '../../components/header/header.component';
 })
 export class MainLayoutComponent {
   subtitle = input<string>('');
-  showBottomNav = input<boolean>(true);
 }

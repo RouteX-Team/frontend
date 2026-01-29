@@ -4,27 +4,6 @@
     </div>
 } @else {
     <div class="dashboard">
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-            <div class="stat-item">
-                <span class="stat-value">{{ activeRoutesCount() }}</span>
-                <span class="stat-label">Active Routes</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">{{ activeBusesCount() }}</span>
-                <span class="stat-label">Buses Running</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value">{{ favoritesCount() }}</span>
-                <span class="stat-label">Favorites</span>
-            </div>
-        </div>
-
-        <!-- Map Section -->
-        <section class="map-section">
-            <rx-map [center]="mapCenter()" [routes]="filteredRoutes()" [buses]="activeBuses()" [showOverlay]="true" />
-        </section>
-
         <!-- Routes Section -->
         <section class="routes-section">
             <div class="section-header">
@@ -63,6 +42,3 @@
         </section>
     </div>
 }
-
-<!-- Bottom Navigation -->
-<rx-bottom-nav [items]="navItems" [activeId]="activeNavItem()" (itemClick)="onNavClick($event)" />

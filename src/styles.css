@@ -406,3 +406,746 @@ body {
 .dark .leaflet-popup-tip {
     background-color: var(--rx-surface);
 }
+
+/* ----------------------------------------
+   PrimeNG Component Overrides
+   ---------------------------------------- */
+
+/* Primary Button */
+.p-button {
+    background: var(--rx-primary-600);
+    border: 1px solid var(--rx-primary-600);
+    color: white;
+    border-radius: var(--rx-radius);
+    font-family: var(--rx-font-family);
+    font-weight: 500;
+    transition: all var(--rx-transition);
+}
+
+.p-button:hover:not(:disabled) {
+    background: var(--rx-primary-700);
+    border-color: var(--rx-primary-700);
+}
+
+.p-button:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* Success Button */
+.p-button-success {
+    background: var(--rx-success-600);
+    border-color: var(--rx-success-600);
+}
+
+.p-button-success:hover:not(:disabled) {
+    background: var(--rx-success-700);
+    border-color: var(--rx-success-700);
+}
+
+/* Warning Button */
+.p-button-warning {
+    background: var(--rx-warning-500);
+    border-color: var(--rx-warning-500);
+    color: white;
+}
+
+.p-button-warning:hover:not(:disabled) {
+    background: var(--rx-warning-600);
+    border-color: var(--rx-warning-600);
+}
+
+/* Danger Button */
+.p-button-danger {
+    background: var(--rx-error-600);
+    border-color: var(--rx-error-600);
+}
+
+.p-button-danger:hover:not(:disabled) {
+    background: var(--rx-error-700);
+    border-color: var(--rx-error-700);
+}
+
+/* Info Button */
+.p-button-info {
+    background: var(--rx-info-600);
+    border-color: var(--rx-info-600);
+}
+
+.p-button-info:hover:not(:disabled) {
+    background: var(--rx-info-500);
+    border-color: var(--rx-info-500);
+}
+
+/* Secondary Button */
+.p-button-secondary {
+    background: var(--rx-slate-100);
+    border-color: var(--rx-slate-200);
+    color: var(--rx-text);
+}
+
+.p-button-secondary:hover:not(:disabled) {
+    background: var(--rx-slate-200);
+    border-color: var(--rx-slate-300);
+}
+
+.dark .p-button-secondary {
+    background: var(--rx-slate-700);
+    border-color: var(--rx-slate-600);
+    color: var(--rx-text);
+}
+
+.dark .p-button-secondary:hover:not(:disabled) {
+    background: var(--rx-slate-600);
+    border-color: var(--rx-slate-500);
+}
+
+/* Outlined Buttons */
+.p-button-outlined {
+    background: transparent;
+    border: 1px solid var(--rx-primary-600);
+    color: var(--rx-primary-600);
+}
+
+.p-button-outlined:hover:not(:disabled) {
+    background: var(--rx-primary-50);
+    border-color: var(--rx-primary-600);
+    color: var(--rx-primary-600);
+}
+
+.dark .p-button-outlined:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.p-button-outlined.p-button-danger {
+    border-color: var(--rx-error-600);
+    color: var(--rx-error-600);
+}
+
+.p-button-outlined.p-button-danger:hover:not(:disabled) {
+    background: var(--rx-error-50);
+}
+
+.dark .p-button-outlined.p-button-danger:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Text Buttons */
+.p-button-text {
+    background: transparent;
+    border-color: transparent;
+    color: var(--rx-primary-600);
+}
+
+.p-button-text:hover:not(:disabled) {
+    background: var(--rx-primary-50);
+    border-color: transparent;
+}
+
+.dark .p-button-text:hover:not(:disabled) {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.p-button-text.p-button-secondary {
+    color: var(--rx-text-secondary);
+}
+
+.p-button-text.p-button-secondary:hover:not(:disabled) {
+    background: var(--rx-slate-100);
+}
+
+.dark .p-button-text.p-button-secondary:hover:not(:disabled) {
+    background: var(--rx-slate-800);
+}
+
+/* Icon-only Buttons */
+.p-button-icon-only {
+    width: 2.5rem;
+    padding: 0.5rem;
+}
+
+.p-button-rounded {
+    border-radius: var(--rx-radius-full);
+}
+
+/* ----------------------------------------
+   PrimeNG Table Styles
+   ---------------------------------------- */
+.p-datatable {
+    font-family: var(--rx-font-family);
+}
+
+.p-datatable .p-datatable-header {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-bottom: none;
+    padding: 1rem;
+    border-radius: var(--rx-radius-lg) var(--rx-radius-lg) 0 0;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+    background: var(--rx-slate-50);
+    color: var(--rx-text-secondary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--rx-border);
+    border-width: 1px 0 1px 0;
+}
+
+.dark .p-datatable .p-datatable-thead > tr > th {
+    background: var(--rx-slate-800);
+    color: var(--rx-text-muted);
+    border-color: var(--rx-border);
+}
+
+.p-datatable .p-datatable-tbody > tr {
+    background: var(--rx-surface);
+    color: var(--rx-text);
+    transition: background-color var(--rx-transition);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+    padding: 1rem;
+    border: 1px solid var(--rx-border-light);
+    border-width: 0 0 1px 0;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+    background: var(--rx-slate-50);
+}
+
+.dark .p-datatable .p-datatable-tbody > tr {
+    background: var(--rx-surface);
+}
+
+.dark .p-datatable .p-datatable-tbody > tr:hover {
+    background: var(--rx-slate-800);
+}
+
+.dark .p-datatable .p-datatable-tbody > tr > td {
+    border-color: var(--rx-border);
+}
+
+/* Table Row Selection */
+.p-datatable .p-datatable-tbody > tr.p-highlight {
+    background: var(--rx-primary-50);
+    color: var(--rx-primary-700);
+}
+
+.dark .p-datatable .p-datatable-tbody > tr.p-highlight {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--rx-primary-400);
+}
+
+/* Paginator */
+.p-paginator {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-top: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0 0 var(--rx-radius-lg) var(--rx-radius-lg);
+}
+
+.dark .p-paginator {
+    background: var(--rx-surface);
+    border-color: var(--rx-border);
+}
+
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev {
+    color: var(--rx-text-secondary);
+    border-radius: var(--rx-radius);
+    min-width: 2.25rem;
+    height: 2.25rem;
+}
+
+.p-paginator .p-paginator-page:hover,
+.p-paginator .p-paginator-next:hover,
+.p-paginator .p-paginator-last:hover,
+.p-paginator .p-paginator-first:hover,
+.p-paginator .p-paginator-prev:hover {
+    background: var(--rx-slate-100);
+}
+
+.dark .p-paginator .p-paginator-page:hover,
+.dark .p-paginator .p-paginator-next:hover,
+.dark .p-paginator .p-paginator-last:hover,
+.dark .p-paginator .p-paginator-first:hover,
+.dark .p-paginator .p-paginator-prev:hover {
+    background: var(--rx-slate-700);
+}
+
+.p-paginator .p-paginator-page.p-highlight {
+    background: var(--rx-primary-600);
+    color: white;
+}
+
+/* ----------------------------------------
+   PrimeNG Dialog Styles
+   ---------------------------------------- */
+.p-dialog {
+    border-radius: var(--rx-radius-xl);
+    box-shadow: var(--rx-shadow-lg);
+    border: 1px solid var(--rx-border);
+}
+
+.p-dialog .p-dialog-header {
+    background: var(--rx-surface);
+    color: var(--rx-text);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--rx-border-light);
+    border-radius: var(--rx-radius-xl) var(--rx-radius-xl) 0 0;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+    color: var(--rx-text-muted);
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--rx-radius);
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+    background: var(--rx-slate-100);
+    color: var(--rx-text);
+}
+
+.dark .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+    background: var(--rx-slate-700);
+}
+
+.p-dialog .p-dialog-content {
+    background: var(--rx-surface);
+    color: var(--rx-text);
+    padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+    background: var(--rx-surface);
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--rx-border-light);
+    border-radius: 0 0 var(--rx-radius-xl) var(--rx-radius-xl);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.dark .p-dialog {
+    background: var(--rx-surface);
+    border-color: var(--rx-border);
+}
+
+.dark .p-dialog .p-dialog-header {
+    background: var(--rx-surface);
+    color: var(--rx-text);
+    border-color: var(--rx-border);
+}
+
+.dark .p-dialog .p-dialog-content {
+    background: var(--rx-surface);
+    color: var(--rx-text);
+}
+
+.dark .p-dialog .p-dialog-footer {
+    background: var(--rx-surface);
+    border-color: var(--rx-border);
+}
+
+/* Dialog Overlay */
+.p-dialog-mask {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+/* ----------------------------------------
+   PrimeNG Input Styles
+   ---------------------------------------- */
+.p-inputtext {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    color: var(--rx-text);
+    border-radius: var(--rx-radius);
+    padding: 0.625rem 0.875rem;
+    font-family: var(--rx-font-family);
+    transition: border-color var(--rx-transition), box-shadow var(--rx-transition);
+}
+
+.p-inputtext:focus {
+    border-color: var(--rx-primary-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.p-inputtext::placeholder {
+    color: var(--rx-text-muted);
+}
+
+.dark .p-inputtext {
+    background: var(--rx-slate-800);
+    border-color: var(--rx-border);
+    color: var(--rx-text);
+}
+
+.dark .p-inputtext:focus {
+    border-color: var(--rx-primary-400);
+}
+
+/* Input Groups */
+.p-inputgroup .p-inputtext {
+    border-radius: 0;
+}
+
+.p-inputgroup .p-inputtext:first-child {
+    border-radius: var(--rx-radius) 0 0 var(--rx-radius);
+}
+
+.p-inputgroup .p-inputtext:last-child {
+    border-radius: 0 var(--rx-radius) var(--rx-radius) 0;
+}
+
+/* ----------------------------------------
+   PrimeNG Select/Dropdown Styles
+   ---------------------------------------- */
+.p-select {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-radius: var(--rx-radius);
+}
+
+.p-select:hover {
+    border-color: var(--rx-primary-400);
+}
+
+.p-select.p-focus {
+    border-color: var(--rx-primary-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.p-select .p-select-label {
+    color: var(--rx-text);
+    padding: 0.625rem 0.875rem;
+}
+
+.p-select-panel {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border);
+    border-radius: var(--rx-radius);
+    box-shadow: var(--rx-shadow-lg);
+}
+
+.p-select-panel .p-select-items .p-select-item {
+    color: var(--rx-text);
+    padding: 0.75rem 1rem;
+    transition: background-color var(--rx-transition);
+}
+
+.p-select-panel .p-select-items .p-select-item:hover {
+    background: var(--rx-slate-50);
+}
+
+.p-select-panel .p-select-items .p-select-item.p-highlight {
+    background: var(--rx-primary-50);
+    color: var(--rx-primary-700);
+}
+
+.dark .p-select {
+    background: var(--rx-slate-800);
+    border-color: var(--rx-border);
+}
+
+.dark .p-select .p-select-label {
+    color: var(--rx-text);
+}
+
+.dark .p-select-panel {
+    background: var(--rx-slate-800);
+    border-color: var(--rx-border);
+}
+
+.dark .p-select-panel .p-select-items .p-select-item {
+    color: var(--rx-text);
+}
+
+.dark .p-select-panel .p-select-items .p-select-item:hover {
+    background: var(--rx-slate-700);
+}
+
+.dark .p-select-panel .p-select-items .p-select-item.p-highlight {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--rx-primary-400);
+}
+
+/* ----------------------------------------
+   PrimeNG Tag Styles
+   ---------------------------------------- */
+.p-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--rx-radius-full);
+}
+
+.p-tag-success {
+    background: var(--rx-success-100);
+    color: var(--rx-success-700);
+}
+
+.dark .p-tag-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--rx-success-400);
+}
+
+.p-tag-warning {
+    background: var(--rx-warning-100);
+    color: var(--rx-warning-700);
+}
+
+.dark .p-tag-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--rx-warning-400);
+}
+
+.p-tag-danger {
+    background: var(--rx-error-100);
+    color: var(--rx-error-700);
+}
+
+.dark .p-tag-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--rx-error-400);
+}
+
+.p-tag-info {
+    background: var(--rx-info-100);
+    color: var(--rx-info-600);
+}
+
+.dark .p-tag-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--rx-info-500);
+}
+
+/* ----------------------------------------
+   PrimeNG Toast Styles
+   ---------------------------------------- */
+.p-toast .p-toast-message {
+    border-radius: var(--rx-radius-lg);
+    box-shadow: var(--rx-shadow-lg);
+}
+
+.p-toast .p-toast-message-success {
+    background: var(--rx-success-50);
+    border: 1px solid var(--rx-success-200);
+    color: var(--rx-success-700);
+}
+
+.p-toast .p-toast-message-info {
+    background: var(--rx-info-50);
+    border: 1px solid var(--rx-info-200);
+    color: var(--rx-info-600);
+}
+
+.p-toast .p-toast-message-warn {
+    background: var(--rx-warning-50);
+    border: 1px solid var(--rx-warning-200);
+    color: var(--rx-warning-700);
+}
+
+.p-toast .p-toast-message-error {
+    background: var(--rx-error-50);
+    border: 1px solid var(--rx-error-200);
+    color: var(--rx-error-700);
+}
+
+.dark .p-toast .p-toast-message-success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--rx-success-700);
+    color: var(--rx-success-400);
+}
+
+.dark .p-toast .p-toast-message-info {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: var(--rx-info-700);
+    color: var(--rx-info-400);
+}
+
+.dark .p-toast .p-toast-message-warn {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: var(--rx-warning-700);
+    color: var(--rx-warning-400);
+}
+
+.dark .p-toast .p-toast-message-error {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: var(--rx-error-700);
+    color: var(--rx-error-400);
+}
+
+/* ----------------------------------------
+   PrimeNG Confirm Dialog Styles
+   ---------------------------------------- */
+.p-confirmdialog .p-dialog-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.p-confirmdialog .p-confirmdialog-icon {
+    font-size: 1.5rem;
+}
+
+.p-confirmdialog .p-confirmdialog-icon.pi-exclamation-triangle {
+    color: var(--rx-warning-500);
+}
+
+.p-confirmdialog .p-confirmdialog-icon.pi-info-circle {
+    color: var(--rx-info-500);
+}
+
+/* ----------------------------------------
+   PrimeNG Progress Bar Styles
+   ---------------------------------------- */
+.p-progressbar {
+    height: 0.5rem;
+    background: var(--rx-slate-200);
+    border-radius: var(--rx-radius-full);
+}
+
+.p-progressbar .p-progressbar-value {
+    background: var(--rx-primary-600);
+    border-radius: var(--rx-radius-full);
+}
+
+.dark .p-progressbar {
+    background: var(--rx-slate-700);
+}
+
+/* ----------------------------------------
+   PrimeNG Checkbox & Radio Styles
+   ---------------------------------------- */
+.p-checkbox .p-checkbox-box {
+    border: 2px solid var(--rx-border);
+    border-radius: var(--rx-radius-sm);
+    background: var(--rx-surface);
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--rx-primary-600);
+    border-color: var(--rx-primary-600);
+}
+
+.p-checkbox .p-checkbox-box:hover {
+    border-color: var(--rx-primary-400);
+}
+
+.dark .p-checkbox .p-checkbox-box {
+    background: var(--rx-slate-800);
+    border-color: var(--rx-border);
+}
+
+.dark .p-checkbox .p-checkbox-box.p-highlight {
+    background: var(--rx-primary-500);
+    border-color: var(--rx-primary-500);
+}
+
+/* ----------------------------------------
+   PrimeNG InputSwitch Styles
+   ---------------------------------------- */
+.p-inputswitch .p-inputswitch-slider {
+    background: var(--rx-slate-300);
+    border-radius: var(--rx-radius-full);
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: var(--rx-primary-600);
+}
+
+.dark .p-inputswitch .p-inputswitch-slider {
+    background: var(--rx-slate-600);
+}
+
+.dark .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: var(--rx-primary-500);
+}
+
+/* ----------------------------------------
+   PrimeNG TabView Styles
+   ---------------------------------------- */
+.p-tabview .p-tabview-nav {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--rx-border);
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    background: transparent;
+    border: none;
+    color: var(--rx-text-muted);
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all var(--rx-transition);
+}
+
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:hover {
+    color: var(--rx-text);
+    border-color: var(--rx-slate-300);
+}
+
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--rx-primary-600);
+    border-color: var(--rx-primary-600);
+}
+
+.dark .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: var(--rx-primary-400);
+    border-color: var(--rx-primary-400);
+}
+
+.p-tabview .p-tabview-panels {
+    background: var(--rx-surface);
+    padding: 1.5rem 0;
+}
+
+/* ----------------------------------------
+   PrimeNG Card Styles
+   ---------------------------------------- */
+.p-card {
+    background: var(--rx-surface);
+    border: 1px solid var(--rx-border-light);
+    border-radius: var(--rx-radius-lg);
+    box-shadow: var(--rx-shadow);
+}
+
+.p-card .p-card-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--rx-border-light);
+}
+
+.p-card .p-card-body {
+    padding: 1.25rem;
+}
+
+.p-card .p-card-footer {
+    padding: 1.25rem;
+    border-top: 1px solid var(--rx-border-light);
+}
+
+.dark .p-card {
+    background: var(--rx-surface);
+    border-color: var(--rx-border);
+}
+
+.dark .p-card .p-card-header,
+.dark .p-card .p-card-footer {
+    border-color: var(--rx-border);
+}

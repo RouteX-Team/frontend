@@ -49,44 +49,6 @@
         </p-table>
     </div>
 
-    <!-- Edit/New Dialog -->
-    <p-dialog [(visible)]="userDialog" [style]="{width: '450px'}" header="Driver Details" [modal]="true"
-        styleClass="p-fluid">
-        <ng-template pTemplate="content">
-            <div class="field mb-4">
-                <label for="name">Full Name</label>
-                <input type="text" pInputText id="name" [(ngModel)]="currentUser().name" required autofocus />
-                <small class="p-error">
-                    @if (submitted() && !currentUser().name) {
-                    Name is required.
-                    }
-                </small>
-            </div>
-
-            <div class="field mb-4">
-                <label for="email">Email Address</label>
-                <input type="email" pInputText id="email" [(ngModel)]="currentUser().email" required />
-                <small class="p-error">
-                    @if (submitted() && !currentUser().email) {
-                    Email is required.
-                    }
-                </small>
-            </div>
-
-            <div class="field mb-4">
-                <label for="route">Assign Route (Optional)</label>
-                <p-autoComplete [suggestions]="routes()" [(ngModel)]="currentUser().assignedRouteId" field="name"
-                    dataKey="id" placeholder="Select a Route" [dropdown]="true"></p-autoComplete>
-            </div>
-        </ng-template>
-
-        <ng-template pTemplate="footer">
-            <button pButton label="Cancel" icon="pi pi-times" class="p-button-text"
-                (click)="userDialog.set(false)"></button>
-            <button pButton label="Save" icon="pi pi-check" class="p-button-primary" (click)="saveDriver()"></button>
-        </ng-template>
-    </p-dialog>
-
     <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
     <p-toast></p-toast>
 </div>

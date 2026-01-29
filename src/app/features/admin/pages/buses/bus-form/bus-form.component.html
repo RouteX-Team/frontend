@@ -1,0 +1,112 @@
+<p-toast />
+
+<div class="bus-form-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" (click)="onCancel()" />
+            <h1>{{ isEditMode() ? 'Edit Bus' : 'Add New Bus' }}</h1>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-content">
+            <!-- Bus Information Section -->
+            <div class="form-section">
+                <h3><i class="pi pi-info-circle"></i> Bus Information</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="plateNumber">Plate Number <span class="required">*</span></label>
+                        <input id="plateNumber" type="text" pInputText
+                               [(ngModel)]="bus().plateNumber"
+                               [class.ng-invalid]="submitted() && !bus().plateNumber"
+                               placeholder="e.g., ABC-1234" />
+                        @if (submitted() && !bus().plateNumber) {
+                            <small class="error-text">Plate number is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="name">Bus Name</label>
+                        <input id="name" type="text" pInputText
+                               [(ngModel)]="bus().name"
+                               placeholder="e.g., Campus Shuttle 1" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="model">Model</label>
+                        <input id="model" type="text" pInputText
+                               [(ngModel)]="bus().model"
+                               placeholder="e.g., Mercedes Sprinter" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="year">Year</label>
+                        <p-inputNumber id="year"
+                                       [(ngModel)]="bus().year"
+                                       [min]="2000" [max]="2030"
+                                       [useGrouping]="false"
+                                       placeholder="e.g., 2023" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capacity & Status Section -->
+            <div class="form-section">
+                <h3><i class="pi pi-cog"></i> Capacity & Status</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="capacity">Capacity <span class="required">*</span></label>
+                        <p-inputNumber id="capacity"
+                                       [(ngModel)]="bus().capacity"
+                                       [min]="1" [max]="100"
+                                       [class.ng-invalid]="submitted() && !bus().capacity"
+                                       suffix=" seats"
+                                       placeholder="e.g., 40" />
+                        @if (submitted() && !bus().capacity) {
+                            <small class="error-text">Capacity is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="status">Status</label>
+                        <p-select id="status"
+                                  [(ngModel)]="bus().status"
+                                  [options]="statusOptions"
+                                  optionLabel="label"
+                                  optionValue="value"
+                                  placeholder="Select status" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="fuelLevel">Fuel Level</label>
+                        <p-inputNumber id="fuelLevel"
+                                       [(ngModel)]="bus().fuelLevel"
+                                       [min]="0" [max]="100"
+                                       suffix="%"
+                                       placeholder="e.g., 80" />
+                    </div>
+
+                    <div class="form-field checkbox-field">
+                        <p-checkbox [(ngModel)]="bus().isAirConditioned"
+                                    [binary]="true"
+                                    inputId="ac" />
+                        <label for="ac">Air Conditioned</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="onCancel()" />
+            <p-button [label]="isEditMode() ? 'Update Bus' : 'Add Bus'"
+                      icon="pi pi-check"
+                      [loading]="loading()"
+                      (click)="onSubmit()" />
+        </div>
+    </div>
+</div>

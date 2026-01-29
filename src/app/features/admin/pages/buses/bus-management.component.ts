@@ -3,15 +3,12 @@
  * Manages the university bus fleet
  */
 
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -27,13 +24,9 @@ import { StatusBadgeComponent } from '../../../../shared/components';
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
         TableModule,
         ButtonModule,
         InputTextModule,
-        InputNumberModule,
-        DialogModule,
-        SelectModule,
         ConfirmDialogModule,
         ToastModule,
         ProgressBarModule,
@@ -45,6 +38,7 @@ import { StatusBadgeComponent } from '../../../../shared/components';
     styleUrl: './bus-management.component.scss'
 })
 export class BusManagementComponent {
+    private router = inject(Router);
     busService = inject(BusService);
     routeService = inject(RouteService);
     private confirmationService = inject(ConfirmationService);
@@ -52,20 +46,6 @@ export class BusManagementComponent {
 
     buses = this.busService.buses;
     routes = this.routeService.routes;
-
-    busDialog = signal(false);
-    submitted = signal(false);
-    editMode = signal(false);
-    currentBus = signal<Partial<Bus>>({});
-
-    statusOptions: { label: string; value: BusStatus }[] = [
-        { label: 'On Route', value: 'on-route' },
-        { label: 'Arriving', value: 'arriving' },
-        { label: 'Delayed', value: 'delayed' },
-        { label: 'Idle', value: 'idle' },
-        { label: 'Offline', value: 'offline' },
-        { label: 'Maintenance', value: 'maintenance' }
-    ];
 
     // Stats
     totalBuses = computed(() => this.buses().length);
@@ -90,26 +70,11 @@ export class BusManagementComponent {
     }
 
     openNew(): void {
-        this.currentBus.set({
-            plateNumber: '',
-            name: '',
-            capacity: 40,
-            model: '',
-            year: new Date().getFullYear(),
-            status: 'idle',
-            fuelLevel: 100,
-            isAirConditioned: true,
-            features: []
-        });
-        this.editMode.set(false);
-        this.submitted.set(false);
-        this.busDialog.set(true);
+        this.router.navigate(['/admin/buses/new']);
     }
 
     editBus(bus: Bus): void {
-        this.currentBus.set({ ...bus });
-        this.editMode.set(true);
-        this.busDialog.set(true);
+        this.router.navigate(['/admin/buses', bus.id, 'edit']);
     }
 
     deleteBus(bus: Bus): void {
@@ -126,33 +91,6 @@ export class BusManagementComponent {
                 });
             }
         });
-    }
-
-    saveBus(): void {
-        this.submitted.set(true);
-
-        const bus = this.currentBus();
-        if (!bus.plateNumber || !bus.capacity) {
-            return;
-        }
-
-        if (this.editMode()) {
-            this.busService.updateBus(bus.id!, bus);
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Updated',
-                detail: `Bus ${bus.plateNumber} updated`
-            });
-        } else {
-            // In a real app, call service to add
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Added',
-                detail: `Bus ${bus.plateNumber} added to fleet`
-            });
-        }
-
-        this.busDialog.set(false);
     }
 
     updateStatus(bus: Bus, status: BusStatus): void {

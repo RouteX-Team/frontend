@@ -2,15 +2,12 @@
  * RouteX - Admin Route Management Component
  */
 
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { DialogModule } from 'primeng/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -22,13 +19,9 @@ import { Route } from '../../../../data/models';
     standalone: true,
     imports: [
         CommonModule,
-        FormsModule,
         TableModule,
         ButtonModule,
         InputTextModule,
-        InputNumberModule,
-        ToggleSwitchModule,
-        DialogModule,
         ConfirmDialogModule,
         ToastModule
     ],
@@ -37,39 +30,19 @@ import { Route } from '../../../../data/models';
     styleUrl: './route-management.component.scss'
 })
 export class RouteManagementComponent {
+    private router = inject(Router);
     routeService = inject(RouteService);
     private confirmationService = inject(ConfirmationService);
     private messageService = inject(MessageService);
 
     routes = this.routeService.routes;
 
-    routeDialog = signal(false);
-    submitted = signal(false);
-
-    // Form state
-    editMode = signal(false);
-    currentRoute = signal<Partial<Route>>({});
-
     openNew(): void {
-        this.currentRoute.set({
-            name: '',
-            shortCode: '',
-            description: '',
-            color: '#6366f1',
-            isActive: true,
-            frequency: 15,
-            estimatedDuration: 30,
-            stops: []
-        });
-        this.editMode.set(false);
-        this.submitted.set(false);
-        this.routeDialog.set(true);
+        this.router.navigate(['/admin/routes/new']);
     }
 
     editRoute(route: Route): void {
-        this.currentRoute.set({ ...route });
-        this.editMode.set(true);
-        this.routeDialog.set(true);
+        this.router.navigate(['/admin/routes', route.id, 'edit']);
     }
 
     deleteRoute(route: Route): void {
@@ -87,28 +60,5 @@ export class RouteManagementComponent {
                 });
             }
         });
-    }
-
-    hideDialog(): void {
-        this.routeDialog.set(false);
-        this.submitted.set(false);
-    }
-
-    saveRoute(): void {
-        this.submitted.set(true);
-        const route = this.currentRoute();
-
-        if (route.name?.trim() && route.shortCode?.trim()) {
-            if (this.editMode()) {
-                this.routeService.updateRoute(route.id!, route);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Route Updated', life: 3000 });
-            } else {
-                this.routeService.addRoute(route as Route);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Route Created', life: 3000 });
-            }
-
-            this.routeDialog.set(false);
-            this.currentRoute.set({});
-        }
     }
 }

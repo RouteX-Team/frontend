@@ -1,0 +1,102 @@
+<p-toast />
+
+<div class="form-page">
+    <div class="page-header">
+        <div class="header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" (click)="onCancel()" />
+            <h1>{{ isEditMode() ? 'Edit Route' : 'Add New Route' }}</h1>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-content">
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h3><i class="pi pi-info-circle"></i> Basic Information</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="name">Route Name <span class="required">*</span></label>
+                        <input id="name" type="text" pInputText
+                               [(ngModel)]="route().name"
+                               [class.ng-invalid]="submitted() && !route().name"
+                               placeholder="e.g., Campus Express" />
+                        @if (submitted() && !route().name) {
+                            <small class="error-text">Route name is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="shortCode">Short Code <span class="required">*</span></label>
+                        <input id="shortCode" type="text" pInputText
+                               [(ngModel)]="route().shortCode"
+                               [class.ng-invalid]="submitted() && !route().shortCode"
+                               placeholder="e.g., CE-01" />
+                        @if (submitted() && !route().shortCode) {
+                            <small class="error-text">Short code is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="color">Theme Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="color"
+                                   [(ngModel)]="route().color"
+                                   class="color-input" />
+                            <span class="color-value">{{ route().color }}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-field toggle-field">
+                        <label>Active Status</label>
+                        <div class="toggle-wrapper">
+                            <p-toggleSwitch [(ngModel)]="route().isActive" />
+                            <span>{{ route().isActive ? 'Active' : 'Inactive' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="description">Description</label>
+                    <textarea id="description" pTextarea
+                              [(ngModel)]="route().description"
+                              rows="3"
+                              placeholder="Route coverage details..."></textarea>
+                </div>
+            </div>
+
+            <!-- Schedule Settings -->
+            <div class="form-section">
+                <h3><i class="pi pi-clock"></i> Schedule Settings</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="frequency">Frequency</label>
+                        <p-inputNumber id="frequency"
+                                       [(ngModel)]="route().frequency"
+                                       [min]="1" [max]="60"
+                                       suffix=" min"
+                                       [showButtons]="true" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="duration">Estimated Duration</label>
+                        <p-inputNumber id="duration"
+                                       [(ngModel)]="route().estimatedDuration"
+                                       [min]="1" [max]="180"
+                                       suffix=" min"
+                                       [showButtons]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="onCancel()" />
+            <p-button [label]="isEditMode() ? 'Update Route' : 'Create Route'"
+                      icon="pi pi-check"
+                      [loading]="loading()"
+                      (click)="onSubmit()" />
+        </div>
+    </div>
+</div>

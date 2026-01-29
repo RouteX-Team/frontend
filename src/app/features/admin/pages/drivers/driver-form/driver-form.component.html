@@ -1,0 +1,76 @@
+<p-toast />
+
+<div class="form-page">
+    <div class="page-header">
+        <div class="header-left">
+            <p-button icon="pi pi-arrow-left" [text]="true" (click)="onCancel()" />
+            <h1>{{ isEditMode() ? 'Edit Driver' : 'Add New Driver' }}</h1>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="form-content">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h3><i class="pi pi-user"></i> Personal Information</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="name">Full Name <span class="required">*</span></label>
+                        <input id="name" type="text" pInputText
+                               [(ngModel)]="driver().name"
+                               [class.ng-invalid]="submitted() && !driver().name"
+                               placeholder="e.g., John Smith" />
+                        @if (submitted() && !driver().name) {
+                            <small class="error-text">Name is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input id="email" type="email" pInputText
+                               [(ngModel)]="driver().email"
+                               [class.ng-invalid]="submitted() && !driver().email"
+                               placeholder="e.g., john.smith@example.com" />
+                        @if (submitted() && !driver().email) {
+                            <small class="error-text">Email is required</small>
+                        }
+                    </div>
+
+                    <div class="form-field">
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" type="tel" pInputText
+                               [(ngModel)]="driver().phone"
+                               placeholder="e.g., +1 234 567 8900" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment -->
+            <div class="form-section">
+                <h3><i class="pi pi-map"></i> Route Assignment</h3>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="route">Assigned Route</label>
+                        <p-select id="route"
+                                  [(ngModel)]="driver().assignedRouteId"
+                                  [options]="routes()"
+                                  optionLabel="name"
+                                  optionValue="id"
+                                  placeholder="Select a route (optional)"
+                                  [showClear]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" severity="secondary" [outlined]="true" (click)="onCancel()" />
+            <p-button [label]="isEditMode() ? 'Update Driver' : 'Add Driver'"
+                      icon="pi pi-check"
+                      [loading]="loading()"
+                      (click)="onSubmit()" />
+        </div>
+    </div>
+</div>

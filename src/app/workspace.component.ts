@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -74,6 +75,7 @@ const SCREEN_TITLES: Record<ScreenId, [string, string]> = {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
@@ -101,6 +103,23 @@ export class WorkspaceComponent implements OnDestroy {
   readonly organization = signal('Aldridge University');
   readonly workspaceName = signal('Transport Services');
   readonly defaultCampus = signal('Main Quad');
+
+  // Form state
+  formOpen = false;
+  formMode: 'create' | 'edit' = 'create';
+  formEntity: ScreenId | null = null;
+  editingId: string | null = null;
+
+  routeForm = { name: '', color: '#3277b8', stops: [] as string[], stopInput: '' };
+  busForm: { plate: string; routeId: string; driverName: string; status: string; capacity: number } = {
+    plate: '',
+    routeId: 'R1',
+    driverName: 'Unassigned',
+    status: 'idle',
+    capacity: 42,
+  };
+  driverForm = { name: '', route: '-', shift: 'AM', status: 'standby' };
+  studentForm = { name: '', grade: 'Freshman', route: 'R1', stop: '', guardian: '', status: 'waiting' };
 
   readonly navSections: { label: string; items: NavItem[] }[] = [
     {
@@ -502,75 +521,226 @@ export class WorkspaceComponent implements OnDestroy {
   }
 
   createRecord(): void {
-    if (this.current === 'routes') {
-      const id = `R${this.routes.length + 1}`;
-      this.routes.push({
-        id,
-        name: 'Campus Connector',
-        color: '#3277b8',
-        tone: 'info',
-        stops: ['Main Quad', 'Library', 'North Dorms'],
-        trips: 1,
-        riders: 0,
-        onTime: 100,
-      });
-      this.showToast(`${id} route created`);
+    if (
+      this.current === 'routes' ||
+      this.current === 'fleet' ||
+      this.current === 'drivers' ||
+      this.current === 'students'
+    ) {
+      this.openForm(this.current);
       return;
     }
-
-    if (this.current === 'fleet') {
-      const label = String(500 + this.buses.length);
-      this.buses.push({
-        id: `B-${label}`,
-        label,
-        plate: `RTX-${label}`,
-        route: 'R1',
-        driver: 'Unassigned',
-        status: 'idle',
-        students: 0,
-        capacity: 42,
-        speed: 0,
-        nextStop: 'Depot',
-        eta: 0,
-        battery: 100,
-        left: 12,
-        top: 72,
-      });
-      this.showToast(`Bus B-${label} added to fleet`);
-      return;
-    }
-
-    if (this.current === 'drivers') {
-      const id = `D${String(this.drivers.length + 1).padStart(2, '0')}`;
-      this.drivers.push({
-        id,
-        name: 'New Driver',
-        route: '-',
-        trips: 0,
-        rating: 5,
-        status: 'standby',
-        shift: 'AM',
-      });
-      this.showToast(`${id} driver profile created`);
-      return;
-    }
-
-    if (this.current === 'students') {
-      const id = `S${String(this.students.length + 1).padStart(3, '0')}`;
-      this.students.push({
-        id,
-        name: 'New Student',
-        grade: 'Freshman',
-        route: 'R1',
-        stop: 'Library',
-        guardian: 'Guardian',
-        status: 'waiting',
-      });
-      this.showToast(`${id} student record created`);
-      return;
-    }
-
     this.showToast('New item action is not available on this screen');
+  }
+
+  openForm(entity: ScreenId, item?: Record<string, unknown>): void {
+    this.formEntity = entity;
+    if (item) {
+      this.formMode = 'edit';
+      this.editingId = item['id'] as string;
+      if (entity === 'routes') {
+        this.routeForm = {
+          name: item['name'] as string,
+          color: item['color'] as string,
+          stops: [...(item['stops'] as string[])],
+          stopInput: '',
+        };
+      } else if (entity === 'fleet') {
+        this.busForm = {
+          plate: item['plate'] as string,
+          routeId: item['route'] as string,
+          driverName: item['driver'] as string,
+          status: item['status'] as string,
+          capacity: item['capacity'] as number,
+        };
+      } else if (entity === 'drivers') {
+        this.driverForm = {
+          name: item['name'] as string,
+          route: item['route'] as string,
+          shift: item['shift'] as string,
+          status: item['status'] as string,
+        };
+      } else if (entity === 'students') {
+        this.studentForm = {
+          name: item['name'] as string,
+          grade: item['grade'] as string,
+          route: item['route'] as string,
+          stop: item['stop'] as string,
+          guardian: item['guardian'] as string,
+          status: item['status'] as string,
+        };
+      }
+    } else {
+      this.formMode = 'create';
+      this.editingId = null;
+      if (entity === 'routes') {
+        this.routeForm = { name: '', color: '#3277b8', stops: [], stopInput: '' };
+      } else if (entity === 'fleet') {
+        this.busForm = { plate: '', routeId: 'R1', driverName: 'Unassigned', status: 'idle', capacity: 42 };
+      } else if (entity === 'drivers') {
+        this.driverForm = { name: '', route: '-', shift: 'AM', status: 'standby' };
+      } else if (entity === 'students') {
+        this.studentForm = { name: '', grade: 'Freshman', route: 'R1', stop: '', guardian: '', status: 'waiting' };
+      }
+    }
+    this.formOpen = true;
+  }
+
+  closeForm(): void {
+    this.formOpen = false;
+  }
+
+  addStop(): void {
+    const stop = this.routeForm.stopInput.trim();
+    if (stop && !this.routeForm.stops.includes(stop)) {
+      this.routeForm.stops = [...this.routeForm.stops, stop];
+    }
+    this.routeForm.stopInput = '';
+  }
+
+  removeStop(index: number): void {
+    this.routeForm.stops = this.routeForm.stops.filter((_, i) => i !== index);
+  }
+
+  submitForm(): void {
+    const entity = this.formEntity;
+    const mode = this.formMode;
+    if (!entity) return;
+
+    if (entity === 'routes') {
+      if (mode === 'create') {
+        const id = `R${this.routes.length + 1}`;
+        this.routes.push({
+          id,
+          name: this.routeForm.name || 'New Route',
+          color: this.routeForm.color,
+          tone: 'brand',
+          stops: [...this.routeForm.stops],
+          trips: 0,
+          riders: 0,
+          onTime: 100,
+        });
+        this.showToast(`${id} route created`);
+      } else {
+        const idx = this.routes.findIndex((r) => r.id === this.editingId);
+        if (idx !== -1) {
+          this.routes[idx] = {
+            ...this.routes[idx],
+            name: this.routeForm.name,
+            color: this.routeForm.color,
+            stops: [...this.routeForm.stops],
+          };
+          this.showToast(`${this.editingId} updated`);
+        }
+      }
+    } else if (entity === 'fleet') {
+      if (mode === 'create') {
+        const label = String(500 + this.buses.length);
+        this.buses.push({
+          id: `B-${label}`,
+          label,
+          plate: this.busForm.plate || `RTX-${label}`,
+          route: this.busForm.routeId,
+          driver: this.busForm.driverName,
+          status: this.busForm.status as RouteXBus['status'],
+          students: 0,
+          capacity: this.busForm.capacity,
+          speed: 0,
+          nextStop: 'Depot',
+          eta: 0,
+          battery: 100,
+          left: 12,
+          top: 72,
+        });
+        this.showToast(`Bus B-${label} added`);
+      } else {
+        const idx = this.buses.findIndex((b) => b.id === this.editingId);
+        if (idx !== -1) {
+          this.buses[idx] = {
+            ...this.buses[idx],
+            plate: this.busForm.plate,
+            route: this.busForm.routeId,
+            driver: this.busForm.driverName,
+            status: this.busForm.status as RouteXBus['status'],
+            capacity: this.busForm.capacity,
+          };
+          this.showToast(`${this.editingId} updated`);
+        }
+      }
+    } else if (entity === 'drivers') {
+      if (mode === 'create') {
+        const id = `D${String(this.drivers.length + 1).padStart(2, '0')}`;
+        this.drivers.push({
+          id,
+          name: this.driverForm.name || 'New Driver',
+          route: this.driverForm.route,
+          trips: 0,
+          rating: 5,
+          status: this.driverForm.status,
+          shift: this.driverForm.shift,
+        });
+        this.showToast(`${id} driver created`);
+      } else {
+        const idx = this.drivers.findIndex((d) => d.id === this.editingId);
+        if (idx !== -1) {
+          this.drivers[idx] = {
+            ...this.drivers[idx],
+            name: this.driverForm.name,
+            route: this.driverForm.route,
+            status: this.driverForm.status,
+            shift: this.driverForm.shift,
+          };
+          this.showToast(`${this.editingId} updated`);
+        }
+      }
+    } else if (entity === 'students') {
+      if (mode === 'create') {
+        const id = `S${String(this.students.length + 1).padStart(3, '0')}`;
+        this.students.push({
+          id,
+          name: this.studentForm.name || 'New Student',
+          grade: this.studentForm.grade,
+          route: this.studentForm.route,
+          stop: this.studentForm.stop,
+          guardian: this.studentForm.guardian,
+          status: this.studentForm.status,
+        });
+        this.showToast(`${id} student created`);
+      } else {
+        const idx = this.students.findIndex((s) => s.id === this.editingId);
+        if (idx !== -1) {
+          this.students[idx] = {
+            ...this.students[idx],
+            name: this.studentForm.name,
+            grade: this.studentForm.grade,
+            route: this.studentForm.route,
+            stop: this.studentForm.stop,
+            guardian: this.studentForm.guardian,
+            status: this.studentForm.status,
+          };
+          this.showToast(`${this.editingId} updated`);
+        }
+      }
+    }
+
+    this.closeForm();
+  }
+
+  deleteRecord(entity: ScreenId, id: string): void {
+    if (entity === 'routes') {
+      const idx = this.routes.findIndex((r) => r.id === id);
+      if (idx !== -1) this.routes.splice(idx, 1);
+    } else if (entity === 'fleet') {
+      const idx = this.buses.findIndex((b) => b.id === id);
+      if (idx !== -1) this.buses.splice(idx, 1);
+    } else if (entity === 'drivers') {
+      const idx = this.drivers.findIndex((d) => d.id === id);
+      if (idx !== -1) this.drivers.splice(idx, 1);
+    } else if (entity === 'students') {
+      const idx = this.students.findIndex((s) => s.id === id);
+      if (idx !== -1) this.students.splice(idx, 1);
+    }
+    this.showToast(`${id} deleted`);
   }
 
   markNotificationRead(note: { unread: boolean; title: string }): void {

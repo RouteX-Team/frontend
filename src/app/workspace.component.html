@@ -186,7 +186,7 @@
         <article class="rx-card table-card">
           <div class="table-head"><h2>Routes</h2><span>Live schedule and coverage</span></div>
           <table>
-            <thead><tr><th>Route</th><th>Stops</th><th>Trips</th><th>Riders</th><th>On time</th><th>Status</th></tr></thead>
+            <thead><tr><th>Route</th><th>Stops</th><th>Trips</th><th>Riders</th><th>On time</th><th>Status</th><th></th></tr></thead>
             <tbody>
               <tr *ngFor="let route of filteredRoutes">
                 <td><span class="route-dot" [style.background]="route.color"></span><b>{{ route.id }}</b> {{ route.name }}</td>
@@ -195,6 +195,12 @@
                 <td>{{ route.riders | number }}</td>
                 <td>{{ route.onTime }}%</td>
                 <td><span class="rx-chip success">Active</span></td>
+                <td class="actions-cell">
+                  <div class="row-actions">
+                    <button mat-icon-button (click)="openForm('routes', $any(route))"><mat-icon>edit</mat-icon></button>
+                    <button mat-icon-button class="danger-btn" (click)="deleteRecord('routes', route.id)"><mat-icon>delete</mat-icon></button>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -208,6 +214,10 @@
           <div class="fleet-top">
             <span class="bus-avatar">{{ bus.label }}</span>
             <span class="rx-chip" [ngClass]="bus.status === 'delayed' ? 'warning' : bus.status === 'idle' ? '' : 'live'">{{ bus.status }}</span>
+            <div class="fleet-row-actions" (click)="$event.stopPropagation()">
+              <button mat-icon-button (click)="openForm('fleet', $any(bus))"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button class="danger-btn" (click)="deleteRecord('fleet', bus.id)"><mat-icon>delete</mat-icon></button>
+            </div>
           </div>
           <h2>{{ bus.id }}</h2>
           <p>{{ routeFor(bus.route).name }} - {{ bus.driver }}</p>
@@ -224,7 +234,7 @@
       <article class="rx-card table-card">
         <div class="table-head"><h2>{{ current === 'drivers' ? 'Drivers' : 'Students' }}</h2><span>Directory and live assignment status</span></div>
         <table *ngIf="current === 'drivers'">
-          <thead><tr><th>Driver</th><th>Route</th><th>Shift</th><th>Trips</th><th>Rating</th><th>Status</th></tr></thead>
+          <thead><tr><th>Driver</th><th>Route</th><th>Shift</th><th>Trips</th><th>Rating</th><th>Status</th><th></th></tr></thead>
           <tbody>
             <tr *ngFor="let driver of filteredDrivers">
               <td><span class="rx-avatar">{{ initials(driver.name) }}</span><b>{{ driver.name }}</b></td>
@@ -233,11 +243,17 @@
               <td>{{ driver.trips }}</td>
               <td>{{ driver.rating }}</td>
               <td><span class="rx-chip" [ngClass]="driver.status === 'active' ? 'success' : driver.status === 'standby' ? 'warning' : ''">{{ driver.status }}</span></td>
+              <td class="actions-cell">
+                <div class="row-actions">
+                  <button mat-icon-button (click)="openForm('drivers', $any(driver))"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button class="danger-btn" (click)="deleteRecord('drivers', driver.id)"><mat-icon>delete</mat-icon></button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
         <table *ngIf="current === 'students'">
-          <thead><tr><th>Student</th><th>Grade</th><th>Route</th><th>Stop</th><th>Guardian</th><th>Status</th></tr></thead>
+          <thead><tr><th>Student</th><th>Grade</th><th>Route</th><th>Stop</th><th>Guardian</th><th>Status</th><th></th></tr></thead>
           <tbody>
             <tr *ngFor="let student of filteredStudents">
               <td><span class="rx-avatar">{{ initials(student.name) }}</span><b>{{ student.name }}</b></td>
@@ -246,6 +262,12 @@
               <td>{{ student.stop }}</td>
               <td>{{ student.guardian }}</td>
               <td><span class="rx-chip" [ngClass]="student.status === 'onboard' ? 'success' : student.status === 'waiting' ? 'warning' : student.status === 'absent' ? 'danger' : 'brand'">{{ student.status }}</span></td>
+              <td class="actions-cell">
+                <div class="row-actions">
+                  <button mat-icon-button (click)="openForm('students', $any(student))"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button class="danger-btn" (click)="deleteRecord('students', student.id)"><mat-icon>delete</mat-icon></button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -290,6 +312,162 @@
     </section>
 
   </main>
+</div>
+
+<div class="rx-backdrop" *ngIf="formOpen" (click)="closeForm()"></div>
+
+<div class="rx-modal rx-card" *ngIf="formOpen">
+  <div class="rx-modal-head">
+    <h2>{{ formMode === 'create' ? 'New' : 'Edit' }} {{ formEntity }}</h2>
+    <button mat-icon-button class="rx-icon-btn" (click)="closeForm()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <!-- Routes form -->
+  <form *ngIf="formEntity === 'routes'" class="rx-form" (ngSubmit)="submitForm()">
+    <label class="rx-form-field">
+      <span>Route name</span>
+      <input [(ngModel)]="routeForm.name" name="rName" placeholder="e.g. Campus Connector" />
+    </label>
+    <label class="rx-form-field">
+      <span>Route color</span>
+      <div class="color-row">
+        <input type="color" [(ngModel)]="routeForm.color" name="rColor" />
+        <span class="color-swatch" [style.background]="routeForm.color"></span>
+        <code>{{ routeForm.color }}</code>
+      </div>
+    </label>
+    <div class="rx-form-field">
+      <span>Stops ({{ routeForm.stops.length }})</span>
+      <div class="stop-tags" *ngIf="routeForm.stops.length">
+        <span *ngFor="let stop of routeForm.stops; let i = index" class="rx-chip">
+          {{ stop }}
+          <button type="button" class="stop-remove" (click)="removeStop(i)"><mat-icon>close</mat-icon></button>
+        </span>
+      </div>
+      <div class="stop-add">
+        <input [(ngModel)]="routeForm.stopInput" name="rStopInput" placeholder="Type a stop name"
+               (keydown.enter)="$event.preventDefault(); addStop()" />
+        <button type="button" mat-button class="rx-btn" (click)="addStop()"><mat-icon>add</mat-icon>Add</button>
+      </div>
+    </div>
+    <div class="rx-modal-footer">
+      <button mat-button type="button" (click)="closeForm()">Cancel</button>
+      <button mat-flat-button class="rx-btn primary" type="submit">{{ formMode === 'create' ? 'Create route' : 'Save changes' }}</button>
+    </div>
+  </form>
+
+  <!-- Fleet form -->
+  <form *ngIf="formEntity === 'fleet'" class="rx-form" (ngSubmit)="submitForm()">
+    <label class="rx-form-field">
+      <span>Plate number</span>
+      <input [(ngModel)]="busForm.plate" name="bPlate" placeholder="e.g. RTX-509" />
+    </label>
+    <label class="rx-form-field">
+      <span>Assigned route</span>
+      <select [(ngModel)]="busForm.routeId" name="bRoute">
+        <option *ngFor="let route of routes" [value]="route.id">{{ route.id }} — {{ route.name }}</option>
+      </select>
+    </label>
+    <label class="rx-form-field">
+      <span>Driver</span>
+      <input [(ngModel)]="busForm.driverName" name="bDriver" placeholder="Driver name" />
+    </label>
+    <label class="rx-form-field">
+      <span>Capacity</span>
+      <input type="number" [(ngModel)]="busForm.capacity" name="bCap" min="1" max="200" />
+    </label>
+    <label class="rx-form-field">
+      <span>Status</span>
+      <select [(ngModel)]="busForm.status" name="bStatus">
+        <option value="live">Live</option>
+        <option value="delayed">Delayed</option>
+        <option value="idle">Idle</option>
+      </select>
+    </label>
+    <div class="rx-modal-footer">
+      <button mat-button type="button" (click)="closeForm()">Cancel</button>
+      <button mat-flat-button class="rx-btn primary" type="submit">{{ formMode === 'create' ? 'Add bus' : 'Save changes' }}</button>
+    </div>
+  </form>
+
+  <!-- Drivers form -->
+  <form *ngIf="formEntity === 'drivers'" class="rx-form" (ngSubmit)="submitForm()">
+    <label class="rx-form-field">
+      <span>Full name</span>
+      <input [(ngModel)]="driverForm.name" name="dName" placeholder="e.g. Maya Okafor" />
+    </label>
+    <label class="rx-form-field">
+      <span>Assigned route</span>
+      <select [(ngModel)]="driverForm.route" name="dRoute">
+        <option value="-">Unassigned</option>
+        <option *ngFor="let route of routes" [value]="route.id">{{ route.id }} — {{ route.name }}</option>
+      </select>
+    </label>
+    <label class="rx-form-field">
+      <span>Shift</span>
+      <select [(ngModel)]="driverForm.shift" name="dShift">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+        <option value="-">Off schedule</option>
+      </select>
+    </label>
+    <label class="rx-form-field">
+      <span>Status</span>
+      <select [(ngModel)]="driverForm.status" name="dStatus">
+        <option value="active">Active</option>
+        <option value="standby">Standby</option>
+        <option value="off">Off duty</option>
+      </select>
+    </label>
+    <div class="rx-modal-footer">
+      <button mat-button type="button" (click)="closeForm()">Cancel</button>
+      <button mat-flat-button class="rx-btn primary" type="submit">{{ formMode === 'create' ? 'Add driver' : 'Save changes' }}</button>
+    </div>
+  </form>
+
+  <!-- Students form -->
+  <form *ngIf="formEntity === 'students'" class="rx-form" (ngSubmit)="submitForm()">
+    <label class="rx-form-field">
+      <span>Full name</span>
+      <input [(ngModel)]="studentForm.name" name="sName" placeholder="Student full name" />
+    </label>
+    <label class="rx-form-field">
+      <span>Grade level</span>
+      <select [(ngModel)]="studentForm.grade" name="sGrade">
+        <option value="Freshman">Freshman</option>
+        <option value="Sophomore">Sophomore</option>
+        <option value="Junior">Junior</option>
+        <option value="Senior">Senior</option>
+      </select>
+    </label>
+    <label class="rx-form-field">
+      <span>Route</span>
+      <select [(ngModel)]="studentForm.route" name="sRoute">
+        <option *ngFor="let route of routes" [value]="route.id">{{ route.id }} — {{ route.name }}</option>
+      </select>
+    </label>
+    <label class="rx-form-field">
+      <span>Stop</span>
+      <input [(ngModel)]="studentForm.stop" name="sStop" placeholder="e.g. Library" />
+    </label>
+    <label class="rx-form-field">
+      <span>Guardian</span>
+      <input [(ngModel)]="studentForm.guardian" name="sGuardian" placeholder="Guardian full name" />
+    </label>
+    <label class="rx-form-field">
+      <span>Status</span>
+      <select [(ngModel)]="studentForm.status" name="sStatus">
+        <option value="onboard">Onboard</option>
+        <option value="waiting">Waiting</option>
+        <option value="dropped">Dropped off</option>
+        <option value="absent">Absent</option>
+      </select>
+    </label>
+    <div class="rx-modal-footer">
+      <button mat-button type="button" (click)="closeForm()">Cancel</button>
+      <button mat-flat-button class="rx-btn primary" type="submit">{{ formMode === 'create' ? 'Add student' : 'Save changes' }}</button>
+    </div>
+  </form>
 </div>
 
 <div *ngIf="toast" class="rx-toast"><mat-icon>check</mat-icon>{{ toast }}</div>

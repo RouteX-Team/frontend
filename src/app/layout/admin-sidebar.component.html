@@ -1,0 +1,47 @@
+<aside class="rx-sidebar">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="27" height="27" rx="8" fill="var(--brand)" />
+      <path d="M7 19c0-5 3.5-5 7-5s7 0 7-5" stroke="var(--on-brand)" stroke-width="1.8" stroke-linecap="round" fill="none" />
+      <circle cx="7" cy="19" r="2.4" fill="var(--on-brand)" />
+      <circle cx="21" cy="9" r="2.4" fill="var(--on-brand)" />
+    </svg>
+    <div>
+      <div class="rx-display brand-title">Route<span class="rx-display-italic">X</span></div>
+      <div class="brand-kicker">Aldridge University</div>
+    </div>
+  </div>
+
+  <button mat-button class="workspace-switch">
+    <span class="rx-avatar small">TS</span>
+    <span>Transport Services</span>
+    <mat-icon>expand_more</mat-icon>
+  </button>
+
+  <nav class="side-nav">
+    <section *ngFor="let section of navSections">
+      <div class="rx-label">{{ section.label }}</div>
+      <button
+        *ngFor="let item of section.items"
+        type="button"
+        class="nav-item"
+        [class.active]="item.id === current"
+        (click)="nav.emit(item.id)"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.name }}</span>
+        <span *ngIf="item.badge === 'live'" class="rx-chip live tiny"><span class="dot"></span>6</span>
+        <span *ngIf="item.count" class="nav-count">{{ item.count | number }}</span>
+      </button>
+    </section>
+  </nav>
+
+  <div class="carbon-card rx-card">
+    <div class="carbon-label">
+      <mat-icon>eco</mat-icon>
+      Carbon saved - today
+    </div>
+    <div class="rx-display carbon-value">142<span> kg CO2e</span></div>
+    <p>vs 638 individual trips</p>
+  </div>
+</aside>

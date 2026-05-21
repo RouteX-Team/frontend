@@ -350,6 +350,15 @@ button {
   gap: 8px;
 }
 
+.route-filter {
+  border-style: solid;
+}
+
+.route-filter.active {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+
 .campus-map {
   height: calc(100% - 58px);
   min-height: 560px;
@@ -779,6 +788,7 @@ td .route-dot {
 
 .fleet-card {
   padding: 18px;
+  cursor: pointer;
 }
 
 .fleet-meta {
@@ -899,6 +909,11 @@ td .route-dot {
   border-radius: var(--r-sm);
   background: var(--surface-2);
   color: var(--ink);
+}
+
+.settings-save {
+  width: 100%;
+  margin-top: 18px;
 }
 
 .pref-row {

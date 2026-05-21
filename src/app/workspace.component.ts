@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -7,6 +7,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './core/auth.service';
 import { ThemeService } from './core/theme.service';
+import { AdminSidebarComponent } from './layout/admin-sidebar.component';
+import { AdminTopbarComponent } from './layout/admin-topbar.component';
 
 type ScreenId =
   | 'tracking'
@@ -16,10 +18,9 @@ type ScreenId =
   | 'drivers'
   | 'students'
   | 'notifications'
-  | 'student-app'
-  | 'parent-app'
-  | 'driver-app'
   | 'settings';
+
+type BusStatusFilter = 'all' | 'live' | 'delayed' | 'idle';
 
 interface NavItem {
   id: ScreenId | 'login';
@@ -65,16 +66,20 @@ const SCREEN_TITLES: Record<ScreenId, [string, string]> = {
   drivers: ['Drivers', '8 drivers - 6 on shift'],
   students: ['Students', '4,912 enrolled - 198 onboard now'],
   notifications: ['Notifications', '3 unread - 7 today'],
-  'student-app': ['Student mobile', 'Preview - iOS'],
-  'parent-app': ['Parent portal', 'Preview - iOS'],
-  'driver-app': ['Driver mobile', 'Preview - iOS'],
   settings: ['Settings', 'Profile - workspace - integrations'],
 };
 
 @Component({
   selector: 'app-workspace',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    AdminSidebarComponent,
+    AdminTopbarComponent,
+  ],
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.css',
 })
@@ -87,6 +92,15 @@ export class WorkspaceComponent implements OnDestroy {
 
   current: ScreenId = 'tracking';
   toast = '';
+  private toastTimer?: ReturnType<typeof setTimeout>;
+  readonly searchTerm = signal('');
+  readonly routeFilter = signal('all');
+  readonly statusFilter = signal<BusStatusFilter>('all');
+  readonly unreadOnly = signal(false);
+  readonly selectedBusId = signal('B-309');
+  readonly organization = signal('Aldridge University');
+  readonly workspaceName = signal('Transport Services');
+  readonly defaultCampus = signal('Main Quad');
 
   readonly navSections: { label: string; items: NavItem[] }[] = [
     {
@@ -108,14 +122,6 @@ export class WorkspaceComponent implements OnDestroy {
     {
       label: 'Communicate',
       items: [{ id: 'notifications', name: 'Notifications', icon: 'notifications', count: 3 }],
-    },
-    {
-      label: 'Apps preview',
-      items: [
-        { id: 'student-app', name: 'Student app', icon: 'smartphone' },
-        { id: 'parent-app', name: 'Parent portal', icon: 'verified_user' },
-        { id: 'driver-app', name: 'Driver app', icon: 'near_me' },
-      ],
     },
     {
       label: 'Account',
@@ -312,6 +318,9 @@ export class WorkspaceComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
   }
 
   get title(): string {
@@ -323,7 +332,7 @@ export class WorkspaceComponent implements OnDestroy {
   }
 
   get selectedBus(): RouteXBus {
-    return this.buses.find((bus) => bus.id === 'B-309') ?? this.buses[0];
+    return this.buses.find((bus) => bus.id === this.selectedBusId()) ?? this.buses[0];
   }
 
   get activeBuses(): number {
@@ -339,13 +348,265 @@ export class WorkspaceComponent implements OnDestroy {
     return Math.round((this.onboardCount / capacity) * 100);
   }
 
-  navigate(id: NavItem['id']): void {
+  get userName(): string {
+    return this.auth.user()?.name ?? 'Elena Marquez';
+  }
+
+  get userInitials(): string {
+    return this.initials(this.userName);
+  }
+
+  get filteredRoutes(): RouteXRoute[] {
+    const routeFilter = this.routeFilter();
+    const query = this.normalizedSearch();
+
+    return this.routes.filter((route) => {
+      const matchesRoute = routeFilter === 'all' || route.id === routeFilter;
+      const matchesQuery = this.matchesSearch(query, [route.id, route.name, ...route.stops]);
+      return matchesRoute && matchesQuery;
+    });
+  }
+
+  get filteredBuses(): RouteXBus[] {
+    const routeFilter = this.routeFilter();
+    const statusFilter = this.statusFilter();
+    const query = this.normalizedSearch();
+
+    return this.buses.filter((bus) => {
+      const matchesRoute = routeFilter === 'all' || bus.route === routeFilter;
+      const matchesStatus = statusFilter === 'all' || bus.status === statusFilter;
+      const route = this.routeFor(bus.route);
+      const matchesQuery = this.matchesSearch(query, [
+        bus.id,
+        bus.label,
+        bus.plate,
+        bus.driver,
+        bus.nextStop,
+        route.name,
+      ]);
+      return matchesRoute && matchesStatus && matchesQuery;
+    });
+  }
+
+  get filteredDrivers(): typeof this.drivers {
+    const query = this.normalizedSearch();
+    return this.drivers.filter((driver) =>
+      this.matchesSearch(query, [
+        driver.id,
+        driver.name,
+        driver.route,
+        driver.status,
+        driver.shift,
+      ]),
+    );
+  }
+
+  get filteredStudents(): typeof this.students {
+    const query = this.normalizedSearch();
+    return this.students.filter((student) =>
+      this.matchesSearch(query, [
+        student.id,
+        student.name,
+        student.grade,
+        student.route,
+        student.stop,
+        student.guardian,
+        student.status,
+      ]),
+    );
+  }
+
+  get filteredNotifications(): typeof this.notifications {
+    const query = this.normalizedSearch();
+    const unreadOnly = this.unreadOnly();
+    return this.notifications.filter((note) => {
+      const matchesUnread = !unreadOnly || note.unread;
+      const matchesQuery = this.matchesSearch(query, [note.title, note.meta, note.time, note.tone]);
+      return matchesUnread && matchesQuery;
+    });
+  }
+
+  get filterLabel(): string {
+    const status = this.statusFilter();
+    return status === 'all' ? 'all buses' : `${status} buses`;
+  }
+
+  navigate(id: string): void {
     if (id === 'login') {
       void this.router.navigate(['/login']);
       return;
     }
 
-    void this.router.navigate(['/', id]);
+    if (!this.isScreen(id)) {
+      void this.router.navigate(['/admin', 'tracking']);
+      return;
+    }
+
+    void this.router.navigate(['/admin', id]);
+  }
+
+  setSearch(term: string): void {
+    this.searchTerm.set(term);
+  }
+
+  selectRouteFilter(id: string): void {
+    this.routeFilter.set(this.routeFilter() === id ? 'all' : id);
+    this.showToast(this.routeFilter() === 'all' ? 'Showing all routes' : `Filtered to ${id}`);
+  }
+
+  selectBus(id: string): void {
+    this.selectedBusId.set(id);
+    this.showToast(`${id} selected`);
+  }
+
+  recenterMap(): void {
+    this.routeFilter.set('all');
+    this.statusFilter.set('all');
+    this.selectedBusId.set('B-309');
+    this.showToast('Map recentered on active fleet');
+  }
+
+  cycleFilter(): void {
+    if (this.current === 'notifications') {
+      this.unreadOnly.update((value) => !value);
+      this.showToast(this.unreadOnly() ? 'Showing unread notifications' : 'Showing all notifications');
+      return;
+    }
+
+    const order: BusStatusFilter[] = ['all', 'live', 'delayed', 'idle'];
+    const next = order[(order.indexOf(this.statusFilter()) + 1) % order.length];
+    this.statusFilter.set(next);
+    this.showToast(`Filter applied: ${this.filterLabel}`);
+  }
+
+  exportView(): void {
+    const counts: Record<ScreenId, number> = {
+      tracking: this.filteredBuses.length,
+      dashboard: this.routes.length,
+      routes: this.filteredRoutes.length,
+      fleet: this.filteredBuses.length,
+      drivers: this.filteredDrivers.length,
+      students: this.filteredStudents.length,
+      notifications: this.filteredNotifications.length,
+      settings: 1,
+    };
+    this.showToast(`Export ready: ${counts[this.current]} ${this.current} records`);
+  }
+
+  jumpToToday(): void {
+    this.searchTerm.set('');
+    this.routeFilter.set('all');
+    this.statusFilter.set('all');
+    this.unreadOnly.set(false);
+    this.showToast('Dashboard reset to today');
+  }
+
+  createRecord(): void {
+    if (this.current === 'routes') {
+      const id = `R${this.routes.length + 1}`;
+      this.routes.push({
+        id,
+        name: 'Campus Connector',
+        color: '#3277b8',
+        tone: 'info',
+        stops: ['Main Quad', 'Library', 'North Dorms'],
+        trips: 1,
+        riders: 0,
+        onTime: 100,
+      });
+      this.showToast(`${id} route created`);
+      return;
+    }
+
+    if (this.current === 'fleet') {
+      const label = String(500 + this.buses.length);
+      this.buses.push({
+        id: `B-${label}`,
+        label,
+        plate: `RTX-${label}`,
+        route: 'R1',
+        driver: 'Unassigned',
+        status: 'idle',
+        students: 0,
+        capacity: 42,
+        speed: 0,
+        nextStop: 'Depot',
+        eta: 0,
+        battery: 100,
+        left: 12,
+        top: 72,
+      });
+      this.showToast(`Bus B-${label} added to fleet`);
+      return;
+    }
+
+    if (this.current === 'drivers') {
+      const id = `D${String(this.drivers.length + 1).padStart(2, '0')}`;
+      this.drivers.push({
+        id,
+        name: 'New Driver',
+        route: '-',
+        trips: 0,
+        rating: 5,
+        status: 'standby',
+        shift: 'AM',
+      });
+      this.showToast(`${id} driver profile created`);
+      return;
+    }
+
+    if (this.current === 'students') {
+      const id = `S${String(this.students.length + 1).padStart(3, '0')}`;
+      this.students.push({
+        id,
+        name: 'New Student',
+        grade: 'Freshman',
+        route: 'R1',
+        stop: 'Library',
+        guardian: 'Guardian',
+        status: 'waiting',
+      });
+      this.showToast(`${id} student record created`);
+      return;
+    }
+
+    this.showToast('New item action is not available on this screen');
+  }
+
+  markNotificationRead(note: { unread: boolean; title: string }): void {
+    note.unread = false;
+    this.showToast(`Marked read: ${note.title}`);
+  }
+
+  notifyRiders(): void {
+    this.notifications.unshift({
+      title: 'Riders notified about B-309 delay',
+      meta: 'West Shuttle - parent and student apps',
+      time: 'Just now',
+      tone: 'info',
+      unread: false,
+    });
+    this.showToast('Riders notified');
+  }
+
+  callDriver(): void {
+    this.showToast(`Calling ${this.selectedBus.driver}`);
+  }
+
+  updateOrganization(event: Event): void {
+    this.organization.set((event.target as HTMLInputElement).value);
+  }
+
+  updateWorkspace(event: Event): void {
+    this.workspaceName.set((event.target as HTMLInputElement).value);
+  }
+
+  updateCampus(event: Event): void {
+    this.defaultCampus.set((event.target as HTMLInputElement).value);
+  }
+
+  saveSettings(): void {
+    this.showToast('Workspace settings saved');
   }
 
   routeFor(id: string): RouteXRoute {
@@ -362,8 +623,12 @@ export class WorkspaceComponent implements OnDestroy {
   }
 
   showToast(message: string): void {
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
+
     this.toast = message;
-    window.setTimeout(() => {
+    this.toastTimer = setTimeout(() => {
       this.toast = '';
     }, 2200);
   }
@@ -375,5 +640,17 @@ export class WorkspaceComponent implements OnDestroy {
 
   private isScreen(value: string | null): value is ScreenId {
     return !!value && Object.prototype.hasOwnProperty.call(SCREEN_TITLES, value);
+  }
+
+  private normalizedSearch(): string {
+    return this.searchTerm().trim().toLowerCase();
+  }
+
+  private matchesSearch(query: string, values: Array<string | number>): boolean {
+    if (!query) {
+      return true;
+    }
+
+    return values.some((value) => String(value).toLowerCase().includes(query));
   }
 }

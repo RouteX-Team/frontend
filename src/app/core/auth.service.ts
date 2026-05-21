@@ -10,12 +10,17 @@ export interface RouteXUser {
 }
 
 const STORAGE_KEY = 'routex-session';
+const VALID_ROLES: RouteXRole[] = ['admin', 'student', 'parent', 'driver'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly browser = isPlatformBrowser(this.platformId);
-  readonly user = signal<RouteXUser | null>(this.readSession());
+  readonly user = signal<RouteXUser | null>(null);
+
+  constructor() {
+    this.user.set(this.readSession());
+  }
 
   login(email: string, role: RouteXRole): void {
     const names: Record<RouteXRole, string> = {
@@ -26,20 +31,28 @@ export class AuthService {
     };
     const user = { email, role, name: names[role] };
     this.user.set(user);
-    if (this.browser) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    if (this.canUseStorage()) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      } catch {
+        // Storage can be unavailable in strict browser/privacy modes.
+      }
     }
   }
 
   logout(): void {
     this.user.set(null);
-    if (this.browser) {
-      localStorage.removeItem(STORAGE_KEY);
+    if (this.canUseStorage()) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Ignore storage failures; the in-memory session is already cleared.
+      }
     }
   }
 
   private readSession(): RouteXUser | null {
-    if (!this.browser) {
+    if (!this.canUseStorage()) {
       return null;
     }
 
@@ -49,10 +62,34 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(raw) as RouteXUser;
+      const parsed: unknown = JSON.parse(raw);
+      if (this.isRouteXUser(parsed)) {
+        return parsed;
+      }
+
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
     } catch {
       localStorage.removeItem(STORAGE_KEY);
       return null;
     }
+  }
+
+  private canUseStorage(): boolean {
+    return this.browser && typeof localStorage !== 'undefined';
+  }
+
+  private isRouteXUser(value: unknown): value is RouteXUser {
+    if (!value || typeof value !== 'object') {
+      return false;
+    }
+
+    const user = value as Partial<RouteXUser>;
+    return (
+      typeof user.name === 'string' &&
+      typeof user.email === 'string' &&
+      typeof user.role === 'string' &&
+      VALID_ROLES.includes(user.role as RouteXRole)
+    );
   }
 }

@@ -1,0 +1,51 @@
+<header class="topbar">
+  <div class="title-block">
+    <h1 class="rx-display">{{ title }}</h1>
+    <p>{{ subtitle }}</p>
+  </div>
+  <div class="topbar-spacer"></div>
+  <label class="search">
+    <mat-icon>search</mat-icon>
+    <input
+      placeholder="Search buses, routes, students..."
+      [value]="search"
+      (input)="updateSearch($event)"
+    />
+    <kbd>Ctrl K</kbd>
+  </label>
+  <div class="top-actions">
+    <ng-container [ngSwitch]="current">
+      <ng-container *ngSwitchCase="'tracking'">
+        <button mat-button class="rx-btn sm" (click)="exportView.emit()"><mat-icon>download</mat-icon>Export</button>
+        <button mat-flat-button class="rx-btn sm primary" (click)="dispatch.emit()"><mat-icon>add</mat-icon>Dispatch</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="'dashboard'">
+        <button mat-button class="rx-btn sm" (click)="today.emit()"><mat-icon>calendar_today</mat-icon>Today</button>
+        <button mat-button class="rx-btn sm" (click)="exportView.emit()"><mat-icon>download</mat-icon>Export</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="'notifications'">
+        <button mat-button class="rx-btn sm" (click)="filter.emit()"><mat-icon>filter_list</mat-icon>Unread</button>
+        <button mat-button class="rx-btn sm" (click)="exportView.emit()"><mat-icon>download</mat-icon>Export</button>
+      </ng-container>
+      <ng-container *ngSwitchCase="'settings'">
+        <button mat-flat-button class="rx-btn sm primary" (click)="save.emit()"><mat-icon>save</mat-icon>Save</button>
+      </ng-container>
+      <ng-container *ngSwitchDefault>
+        <button mat-button class="rx-btn sm" (click)="filter.emit()"><mat-icon>filter_list</mat-icon>Filter</button>
+        <button mat-flat-button class="rx-btn sm primary" (click)="create.emit()"><mat-icon>add</mat-icon>New</button>
+      </ng-container>
+    </ng-container>
+    <button mat-icon-button class="rx-icon-btn" matTooltip="Notifications" (click)="notifications.emit()">
+      <mat-icon>notifications</mat-icon>
+      <span class="notify-dot"></span>
+    </button>
+    <button mat-icon-button class="rx-icon-btn" matTooltip="Toggle theme" (click)="themeToggle.emit()">
+      <mat-icon>{{ theme === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+    <button mat-button class="profile-btn">
+      <span class="rx-avatar">{{ userInitials }}</span>
+      <span>{{ userName }}</span>
+      <mat-icon>expand_more</mat-icon>
+    </button>
+  </div>
+</header>

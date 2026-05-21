@@ -6,6 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, RouteXRole } from './core/auth.service';
 
+const ROLE_LANDING: Record<RouteXRole, string> = {
+  admin: '/admin/tracking',
+  student: '/student',
+  parent: '/parent',
+  driver: '/driver',
+};
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -30,7 +37,14 @@ export class LoginComponent {
 
   signIn(): void {
     this.auth.login(this.email, this.role);
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/tracking';
-    void this.router.navigateByUrl(returnUrl);
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    const roleDefault = ROLE_LANDING[this.role];
+    const returnMatchesRole =
+      !!returnUrl &&
+      ((this.role === 'admin' && returnUrl.startsWith('/admin')) ||
+        (this.role !== 'admin' && returnUrl === roleDefault));
+
+    const target = returnMatchesRole && returnUrl ? returnUrl : roleDefault;
+    void this.router.navigateByUrl(target);
   }
 }

@@ -1,0 +1,253 @@
+<main class="role-shell" [class.driver-shell]="role === 'driver'">
+  <header class="app-header">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="27" height="27" rx="8" fill="var(--brand)" />
+        <path d="M7 19c0-5 3.5-5 7-5s7 0 7-5" stroke="var(--on-brand)" stroke-width="1.8" stroke-linecap="round" fill="none" />
+        <circle cx="7" cy="19" r="2.4" fill="var(--on-brand)" />
+        <circle cx="21" cy="9" r="2.4" fill="var(--on-brand)" />
+      </svg>
+      <div>
+        <strong class="rx-display">Route<span>X</span></strong>
+        <small>{{ roleLabel }}</small>
+      </div>
+    </div>
+
+    <button mat-button class="profile" type="button" (click)="logout()">
+      <span class="rx-avatar">{{ initials }}</span>
+      <span class="profile-name">{{ userName }}</span>
+      <mat-icon>logout</mat-icon>
+    </button>
+  </header>
+
+  <section class="hero-panel">
+    <span class="rx-eyebrow">
+      @switch (role) {
+        @case ('student') { Next ride }
+        @case ('parent') { Family status }
+        @case ('driver') { Current shift }
+      }
+    </span>
+    <h1 class="rx-display">{{ heroTitle() }}</h1>
+    <p>
+      @switch (role) {
+        @case ('student') { Keep your pass ready, see live ETAs, and check in when you board. }
+        @case ('parent') { Follow pickup status, receive alerts, and message transport services from one place. }
+        @case ('driver') { Complete checks, follow the stop manifest, and keep dispatch updated during the route. }
+      }
+    </p>
+  </section>
+
+  <nav class="module-tabs" aria-label="App modules">
+    @for (tab of tabs(); track tab.id) {
+      <button type="button" [class.active]="activeTab() === tab.id" (click)="selectTab(tab.id)">
+        <mat-icon>{{ tab.icon }}</mat-icon>
+        <span>{{ tab.label }}</span>
+        @if (role === 'parent' && tab.id === 'inbox' && unreadCount() > 0) {
+          <b>{{ unreadCount() }}</b>
+        }
+      </button>
+    }
+  </nav>
+
+  <section class="app-content">
+    @switch (role) {
+      @case ('student') {
+        @switch (activeTab()) {
+          @case ('home') {
+            <article class="glass-card trip-hero">
+              <div>
+                <span class="rx-chip live"><span class="dot"></span>{{ activeRoute().status }}</span>
+                <h2>{{ activeRoute().name }}</h2>
+                <p>{{ activeRoute().bus }} reaches Library in {{ activeRoute().eta }}</p>
+              </div>
+              <mat-icon>directions_bus</mat-icon>
+            </article>
+
+            <div class="action-grid">
+              <button type="button" class="action-card primary-action" (click)="toggleCheckIn()">
+                <mat-icon>{{ checkedIn() ? 'check_circle' : 'qr_code_scanner' }}</mat-icon>
+                <span>{{ checkedIn() ? 'Checked in' : 'Check in' }}</span>
+                <small>{{ checkedIn() ? 'Seat confirmed' : 'Scan at boarding' }}</small>
+              </button>
+              <button type="button" class="action-card" (click)="selectTab('pass')">
+                <mat-icon>badge</mat-icon>
+                <span>Open pass</span>
+                <small>Valid today</small>
+              </button>
+            </div>
+
+            <section class="list-card">
+              <h3>Upcoming stops</h3>
+              @for (stop of stops; track stop.name) {
+                <div class="stop-row" [class.current]="stop.status === 'current'">
+                  <span></span>
+                  <div><b>{{ stop.name }}</b><small>{{ stop.riders }} riders</small></div>
+                  <strong>{{ stop.eta }}</strong>
+                </div>
+              }
+            </section>
+          }
+
+          @case ('pass') {
+            <article class="pass-card">
+              <span>Student pass</span>
+              <strong>{{ userName }}</strong>
+              <small>Aldridge University - Main Loop</small>
+              <div class="qr" aria-label="Student pass QR code">
+                @for (cell of heatmap; track $index) {
+                  <i [style.opacity]="cell / 100"></i>
+                }
+              </div>
+              <button mat-flat-button type="button" class="wide-btn" (click)="toggleCheckIn()">
+                <mat-icon>{{ checkedIn() ? 'check' : 'directions_bus' }}</mat-icon>
+                {{ checkedIn() ? 'Boarding confirmed' : 'Confirm boarding' }}
+              </button>
+            </article>
+          }
+
+          @case ('routes') {
+            <section class="list-card">
+              <h3>Available routes</h3>
+              @for (route of routes; track route.id) {
+                <button type="button" class="route-row" [class.active]="selectedRoute() === route.id" (click)="selectRoute(route.id)">
+                  <span class="route-dot" [style.background]="route.color"></span>
+                  <div><b>{{ route.name }}</b><small>{{ route.bus }} - {{ route.eta }}</small></div>
+                  <strong>{{ route.status }}</strong>
+                </button>
+              }
+            </section>
+          }
+        }
+      }
+
+      @case ('parent') {
+        @switch (activeTab()) {
+          @case ('family') {
+            <section class="child-selector">
+              @for (child of ['Amelia Tran', 'Carlos Mendes']; track child) {
+                <button type="button" [class.active]="selectedChild() === child" (click)="selectChild(child)">
+                  <span class="rx-avatar">{{ initialsOf(child) }}</span>
+                  <span>{{ child }}</span>
+                </button>
+              }
+            </section>
+
+            <article class="glass-card family-card">
+              <div>
+                <span class="rx-chip success">Onboard</span>
+                <h2>{{ selectedChild() }}</h2>
+                <p>B-204 - Library ETA 3 min</p>
+              </div>
+              <button type="button" class="icon-pill" (click)="togglePickupAlerts()">
+                <mat-icon>{{ pickupAlerts() ? 'notifications_active' : 'notifications_off' }}</mat-icon>
+              </button>
+            </article>
+
+            <section class="trip-map">
+              <div class="trip-line"><span></span><span></span><span></span></div>
+              <div class="trip-labels"><span>Boarded</span><span>Library</span><span>Dorms</span></div>
+            </section>
+
+            <div class="info-grid">
+              <div><span>Pickup alerts</span><b>{{ pickupAlerts() ? 'On' : 'Off' }}</b></div>
+              <div><span>Weekly rides</span><b>9</b></div>
+            </div>
+          }
+
+          @case ('inbox') {
+            <section class="list-card">
+              <h3>Inbox</h3>
+              @for (message of messages(); track message.time; let index = $index) {
+                <button type="button" class="message-row" [class.unread]="message.unread" (click)="markMessageRead(index)">
+                  <span class="tone"><mat-icon>{{ message.unread ? 'markunread' : 'drafts' }}</mat-icon></span>
+                  <div><b>{{ message.from }}</b><small>{{ message.body }}</small></div>
+                  <time>{{ message.time }}</time>
+                </button>
+              }
+            </section>
+          }
+
+          @case ('trips') {
+            <section class="list-card">
+              <h3>Trip history</h3>
+              @for (trip of tripHistory; track trip.day) {
+                <div class="history-row">
+                  <div><b>{{ trip.day }}</b><small>{{ trip.route }} - {{ trip.time }}</small></div>
+                  <span>{{ trip.result }}</span>
+                </div>
+              }
+            </section>
+          }
+        }
+      }
+
+      @case ('driver') {
+        @switch (activeTab()) {
+          @case ('checklist') {
+            <article class="driver-hero">
+              <strong>{{ tripStarted() ? 'Route in progress' : 'Depart in 08:14' }}</strong>
+              <span>Bus B-204 - Bay 3</span>
+            </article>
+
+            <section class="list-card dark-list">
+              <h3>Pre-trip checklist</h3>
+              @for (check of [
+                { key: 'inspection', label: 'Vehicle inspection' },
+                { key: 'manifest', label: 'Student manifest synced' },
+                { key: 'radio', label: 'Radio check with dispatch' },
+                { key: 'firstAid', label: 'First-aid kit confirmed' }
+              ]; track check.key) {
+                <button type="button" class="check-row" [class.done]="checklist()[check.key]" (click)="toggleChecklist(check.key)">
+                  <mat-icon>{{ checklist()[check.key] ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                  <span>{{ check.label }}</span>
+                </button>
+              }
+            </section>
+
+            <button type="button" class="start-trip" [disabled]="!canStartTrip()" (click)="startTrip()">
+              {{ tripStarted() ? 'Continue route' : canStartTrip() ? 'Begin trip' : completedChecks() + '/4 checks complete' }}
+            </button>
+          }
+
+          @case ('manifest') {
+            <section class="list-card dark-list">
+              <h3>Manifest</h3>
+              @for (rider of riders; track rider.name) {
+                <div class="rider-row">
+                  <span class="rx-avatar">{{ initialsOf(rider.name) }}</span>
+                  <div><b>{{ rider.name }}</b><small>{{ rider.stop }}</small></div>
+                  <strong>{{ rider.status }}</strong>
+                </div>
+              }
+            </section>
+          }
+
+          @case ('routes') {
+            <article class="glass-card dark-card">
+              <div>
+                <span class="rx-chip live"><span class="dot"></span>{{ tripStarted() ? 'Live' : 'Ready' }}</span>
+                <h2>{{ currentStop().name }}</h2>
+                <p>{{ currentStop().riders }} riders - {{ currentStop().eta }}</p>
+              </div>
+              <mat-icon>near_me</mat-icon>
+            </article>
+
+            <section class="list-card dark-list">
+              <h3>Stop sequence</h3>
+              @for (stop of stops; track stop.name; let index = $index) {
+                <div class="stop-row" [class.current]="index === currentStopIndex()" [class.done]="index < currentStopIndex()">
+                  <span></span>
+                  <div><b>{{ stop.name }}</b><small>{{ stop.riders }} riders</small></div>
+                  <strong>{{ index < currentStopIndex() ? 'Done' : stop.eta }}</strong>
+                </div>
+              }
+            </section>
+
+            <button type="button" class="start-trip" (click)="completeStop()">Complete current stop</button>
+          }
+        }
+      }
+    }
+  </section>
+</main>

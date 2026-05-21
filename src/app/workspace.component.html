@@ -1,93 +1,25 @@
 <div class="rx-shell">
-  <aside class="rx-sidebar">
-    <div class="brand">
-      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-        <rect x="0.5" y="0.5" width="27" height="27" rx="8" fill="var(--brand)" />
-        <path d="M7 19c0-5 3.5-5 7-5s7 0 7-5" stroke="var(--on-brand)" stroke-width="1.8" stroke-linecap="round" fill="none" />
-        <circle cx="7" cy="19" r="2.4" fill="var(--on-brand)" />
-        <circle cx="21" cy="9" r="2.4" fill="var(--on-brand)" />
-      </svg>
-      <div>
-        <div class="rx-display brand-title">Route<span class="rx-display-italic">X</span></div>
-        <div class="brand-kicker">Aldridge University</div>
-      </div>
-    </div>
-
-    <button mat-button class="workspace-switch">
-      <span class="rx-avatar small">TS</span>
-      <span>Transport Services</span>
-      <mat-icon>expand_more</mat-icon>
-    </button>
-
-    <nav class="side-nav">
-      <section *ngFor="let section of navSections">
-        <div class="rx-label">{{ section.label }}</div>
-        <button
-          *ngFor="let item of section.items"
-          type="button"
-          class="nav-item"
-          [class.active]="item.id === current"
-          (click)="navigate(item.id)"
-        >
-          <mat-icon>{{ item.icon }}</mat-icon>
-          <span>{{ item.name }}</span>
-          <span *ngIf="item.badge === 'live'" class="rx-chip live tiny"><span class="dot"></span>6</span>
-          <span *ngIf="item.count" class="nav-count">{{ item.count | number }}</span>
-        </button>
-      </section>
-    </nav>
-
-    <div class="carbon-card rx-card">
-      <div class="carbon-label">
-        <mat-icon>eco</mat-icon>
-        Carbon saved - today
-      </div>
-      <div class="rx-display carbon-value">142<span> kg CO2e</span></div>
-      <p>vs 638 individual trips</p>
-    </div>
-  </aside>
+  <app-admin-sidebar [current]="current" [navSections]="navSections" (nav)="navigate($event)"></app-admin-sidebar>
 
   <main class="rx-main">
-    <header class="topbar">
-      <div class="title-block">
-        <h1 class="rx-display">{{ title }}</h1>
-        <p>{{ subtitle }}</p>
-      </div>
-      <div class="topbar-spacer"></div>
-      <label class="search">
-        <mat-icon>search</mat-icon>
-        <input placeholder="Search buses, routes, students..." />
-        <kbd>Ctrl K</kbd>
-      </label>
-      <div class="top-actions">
-        <ng-container [ngSwitch]="current">
-          <ng-container *ngSwitchCase="'tracking'">
-            <button mat-button class="rx-btn sm"><mat-icon>download</mat-icon>Export</button>
-            <button mat-flat-button class="rx-btn sm primary" (click)="showToast('Dispatch flow opened')"><mat-icon>add</mat-icon>Dispatch</button>
-          </ng-container>
-          <ng-container *ngSwitchCase="'dashboard'">
-            <button mat-button class="rx-btn sm"><mat-icon>calendar_today</mat-icon>Today</button>
-            <button mat-button class="rx-btn sm"><mat-icon>download</mat-icon>Export</button>
-          </ng-container>
-          <ng-container *ngSwitchDefault>
-            <button mat-button class="rx-btn sm"><mat-icon>filter_list</mat-icon>Filter</button>
-            <button mat-flat-button class="rx-btn sm primary"><mat-icon>add</mat-icon>New</button>
-          </ng-container>
-        </ng-container>
-        <button mat-icon-button class="rx-icon-btn" matTooltip="Notifications" (click)="navigate('notifications')">
-          <mat-icon>notifications</mat-icon>
-          <span class="notify-dot"></span>
-        </button>
-        <button mat-icon-button class="rx-icon-btn" matTooltip="Toggle theme" (click)="theme.toggleTheme()">
-          <mat-icon>{{ theme.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-        </button>
-        <button mat-button class="profile-btn">
-          <span class="rx-avatar">EM</span>
-          <span>Elena Marquez</span>
-          <mat-icon>expand_more</mat-icon>
-        </button>
-      </div>
-    </header>
+    <app-admin-topbar
+      [current]="current"
+      [title]="title"
+      [subtitle]="subtitle"
+      [theme]="theme.theme()"
+      [userName]="userName"
+      [userInitials]="userInitials"
+      [search]="searchTerm()"
+      (notifications)="navigate('notifications')"
+      (themeToggle)="theme.toggleTheme()"
+      (dispatch)="showToast('Dispatch flow opened')"
+      (exportView)="exportView()"
+      (filter)="cycleFilter()"
+      (create)="createRecord()"
+      (today)="jumpToToday()"
+      (save)="saveSettings()"
+      (searchChange)="setSearch($event)"
+    ></app-admin-topbar>
 
     <div class="mobile-tabs">
       <button *ngFor="let item of navSections[0].items" (click)="navigate(item.id)" [class.active]="item.id === current">
@@ -102,9 +34,19 @@
           <div class="map-toolbar">
             <div class="route-pills">
               <span class="rx-chip live"><span class="dot"></span>Live</span>
-              <span *ngFor="let route of routes" class="rx-chip" [style.border-color]="route.color" [style.color]="route.color">{{ route.id }}</span>
+              <button
+                *ngFor="let route of routes"
+                type="button"
+                class="rx-chip route-filter"
+                [class.active]="routeFilter() === route.id"
+                [style.border-color]="route.color"
+                [style.color]="route.color"
+                (click)="selectRouteFilter(route.id)"
+              >
+                {{ route.id }}
+              </button>
             </div>
-            <button mat-button class="rx-btn sm"><mat-icon>my_location</mat-icon>Recenter</button>
+            <button mat-button class="rx-btn sm" (click)="recenterMap()"><mat-icon>my_location</mat-icon>Recenter</button>
           </div>
           <div class="campus-map">
             <svg viewBox="0 0 900 560" preserveAspectRatio="none" aria-hidden="true">
@@ -128,13 +70,13 @@
             <div class="map-place west">West Village</div>
             <div class="map-place lake">Lake Path</div>
             <button
-              *ngFor="let bus of buses"
+              *ngFor="let bus of filteredBuses"
               type="button"
               class="bus-pin"
               [ngClass]="bus.status"
               [style.left.%]="bus.left"
               [style.top.%]="bus.top"
-              (click)="showToast(bus.id + ' selected')"
+              (click)="selectBus(bus.id)"
             >
               <mat-icon>directions_bus</mat-icon>
               <span>{{ bus.label }}</span>
@@ -163,7 +105,12 @@
                 <h2>{{ selectedBus.id }}</h2>
                 <p>{{ routeFor(selectedBus.route).name }} - {{ selectedBus.plate }}</p>
               </div>
-              <span class="rx-chip warning">Delayed</span>
+              <span
+                class="rx-chip"
+                [ngClass]="selectedBus.status === 'delayed' ? 'warning' : selectedBus.status === 'live' ? 'live' : ''"
+              >
+                {{ selectedBus.status }}
+              </span>
             </div>
             <div class="detail-grid">
               <div><span>Driver</span><strong>{{ selectedBus.driver }}</strong></div>
@@ -183,7 +130,7 @@
               <span>Route load</span>
               <strong>Now</strong>
             </div>
-            <div class="load-row" *ngFor="let route of routes">
+            <div class="load-row" *ngFor="let route of filteredRoutes">
               <span class="route-dot" [style.background]="route.color"></span>
               <span>{{ route.name }}</span>
               <div class="load-track"><i [style.width.%]="route.onTime"></i></div>
@@ -219,7 +166,7 @@
         <article class="rx-card activity-card">
           <div class="section-title"><span>Activity timeline</span><strong>Live</strong></div>
           <div class="timeline">
-            <div *ngFor="let note of notifications.slice(0, 5)" [class.unread]="note.unread">
+            <div *ngFor="let note of filteredNotifications.slice(0, 5)" [class.unread]="note.unread">
               <span></span>
               <p>{{ note.title }}<em>{{ note.time }}</em></p>
             </div>
@@ -241,7 +188,7 @@
           <table>
             <thead><tr><th>Route</th><th>Stops</th><th>Trips</th><th>Riders</th><th>On time</th><th>Status</th></tr></thead>
             <tbody>
-              <tr *ngFor="let route of routes">
+              <tr *ngFor="let route of filteredRoutes">
                 <td><span class="route-dot" [style.background]="route.color"></span><b>{{ route.id }}</b> {{ route.name }}</td>
                 <td>{{ route.stops.length }} stops</td>
                 <td>{{ route.trips }}</td>
@@ -257,7 +204,7 @@
 
     <section class="screen" *ngIf="current === 'fleet'">
       <div class="fleet-grid">
-        <article *ngFor="let bus of buses" class="rx-card fleet-card">
+        <article *ngFor="let bus of filteredBuses" class="rx-card fleet-card" (click)="selectBus(bus.id)">
           <div class="fleet-top">
             <span class="bus-avatar">{{ bus.label }}</span>
             <span class="rx-chip" [ngClass]="bus.status === 'delayed' ? 'warning' : bus.status === 'idle' ? '' : 'live'">{{ bus.status }}</span>
@@ -279,7 +226,7 @@
         <table *ngIf="current === 'drivers'">
           <thead><tr><th>Driver</th><th>Route</th><th>Shift</th><th>Trips</th><th>Rating</th><th>Status</th></tr></thead>
           <tbody>
-            <tr *ngFor="let driver of drivers">
+            <tr *ngFor="let driver of filteredDrivers">
               <td><span class="rx-avatar">{{ initials(driver.name) }}</span><b>{{ driver.name }}</b></td>
               <td>{{ driver.route }}</td>
               <td>{{ driver.shift }}</td>
@@ -292,7 +239,7 @@
         <table *ngIf="current === 'students'">
           <thead><tr><th>Student</th><th>Grade</th><th>Route</th><th>Stop</th><th>Guardian</th><th>Status</th></tr></thead>
           <tbody>
-            <tr *ngFor="let student of students">
+            <tr *ngFor="let student of filteredStudents">
               <td><span class="rx-avatar">{{ initials(student.name) }}</span><b>{{ student.name }}</b></td>
               <td>{{ student.grade }}</td>
               <td>{{ student.route }}</td>
@@ -308,7 +255,7 @@
     <section class="screen" *ngIf="current === 'notifications'">
       <div class="notif-layout">
         <article class="rx-card notif-list">
-          <button *ngFor="let note of notifications" class="notif-row" [class.unread]="note.unread">
+          <button *ngFor="let note of filteredNotifications" class="notif-row" [class.unread]="note.unread" (click)="markNotificationRead(note)">
             <span class="tone" [ngClass]="note.tone"><mat-icon>{{ note.tone === 'warning' ? 'warning' : note.tone === 'danger' ? 'sos' : 'notifications' }}</mat-icon></span>
             <span><b>{{ note.title }}</b><em>{{ note.meta }}</em></span>
             <time>{{ note.time }}</time>
@@ -318,8 +265,8 @@
           <span class="rx-chip warning">Priority</span>
           <h2>B-309 delayed 7 min</h2>
           <p>West Shuttle is moving slowly near West Village. Dispatch should notify waiting students and confirm the next stop handoff.</p>
-          <button mat-flat-button class="rx-btn primary"><mat-icon>campaign</mat-icon>Notify riders</button>
-          <button mat-button class="rx-btn"><mat-icon>call</mat-icon>Call driver</button>
+          <button mat-flat-button class="rx-btn primary" (click)="notifyRiders()"><mat-icon>campaign</mat-icon>Notify riders</button>
+          <button mat-button class="rx-btn" (click)="callDriver()"><mat-icon>call</mat-icon>Call driver</button>
         </aside>
       </div>
     </section>
@@ -328,67 +275,20 @@
       <div class="settings-grid">
         <article class="rx-card settings-panel">
           <div class="table-head"><h2>Workspace</h2><span>Campus identity and dispatch preferences</span></div>
-          <label><span>Organization</span><input value="Aldridge University" /></label>
-          <label><span>Workspace</span><input value="Transport Services" /></label>
-          <label><span>Default campus</span><input value="Main Quad" /></label>
+          <label><span>Organization</span><input [value]="organization()" (input)="updateOrganization($event)" /></label>
+          <label><span>Workspace</span><input [value]="workspaceName()" (input)="updateWorkspace($event)" /></label>
+          <label><span>Default campus</span><input [value]="defaultCampus()" (input)="updateCampus($event)" /></label>
+          <button mat-flat-button class="rx-btn primary settings-save" (click)="saveSettings()"><mat-icon>save</mat-icon>Save settings</button>
         </article>
         <article class="rx-card settings-panel">
           <div class="table-head"><h2>Preferences</h2><span>Theme and density</span></div>
           <button class="pref-row" (click)="theme.toggleTheme()"><span><mat-icon>contrast</mat-icon>Theme</span><b>{{ theme.theme() }}</b></button>
           <button class="pref-row" (click)="theme.toggleDensity()"><span><mat-icon>density_medium</mat-icon>Density</span><b>{{ theme.density() }}</b></button>
-          <button class="pref-row" (click)="logout()"><span><mat-icon>logout</mat-icon>Sign out</span><b>Elena</b></button>
+          <button class="pref-row" (click)="logout()"><span><mat-icon>logout</mat-icon>Sign out</span><b>{{ userName }}</b></button>
         </article>
       </div>
     </section>
 
-    <section class="screen mobile-preview" *ngIf="current === 'student-app' || current === 'parent-app' || current === 'driver-app'">
-      <div class="phone-copy">
-        <span class="rx-eyebrow">Mobile preview</span>
-        <h2 class="rx-display">{{ current === 'student-app' ? 'Student trip companion' : current === 'parent-app' ? 'Parent portal' : 'Driver cockpit' }}</h2>
-        <p>{{ current === 'student-app' ? 'A pass, route status, and stop ETAs in a compact iOS shell.' : current === 'parent-app' ? 'Family-level visibility with arrival alerts and trip history.' : 'Pre-trip checks, stop manifest, and live route progress for drivers.' }}</p>
-        <div class="feature-list">
-          <span><mat-icon>verified</mat-icon>Liquid glass controls</span>
-          <span><mat-icon>qr_code_2</mat-icon>RouteX pass and manifest</span>
-          <span><mat-icon>near_me</mat-icon>Live pickup guidance</span>
-        </div>
-      </div>
-      <div class="phone-stage">
-        <div class="iphone" [class.dark-phone]="current === 'driver-app'">
-          <div class="island"></div>
-          <div class="statusbar"><b>9:41</b><span><mat-icon>wifi</mat-icon><mat-icon>battery_full</mat-icon></span></div>
-          <div class="phone-screen" [ngSwitch]="current">
-            <div *ngSwitchCase="'student-app'" class="student-phone">
-              <h3>RouteX</h3>
-              <div class="pass-card">
-                <span>Student pass</span>
-                <strong>Amelia Tran</strong>
-                <div class="qr"><i *ngFor="let cell of heatmap"></i></div>
-              </div>
-              <div class="arrival-card"><mat-icon>directions_bus</mat-icon><div><b>B-204 arriving</b><span>Library stop - 3 min</span></div></div>
-              <div class="phone-list"><span>Main Loop</span><b>On time</b></div>
-              <div class="phone-list"><span>Seat check-in</span><b>28 / 42</b></div>
-            </div>
-            <div *ngSwitchCase="'parent-app'" class="parent-phone">
-              <h3>Family</h3>
-              <div class="kid-card"><span class="rx-avatar">AT</span><div><b>Amelia is onboard</b><em>B-204 - Library ETA 3 min</em></div></div>
-              <div class="trip-line"><span></span><span></span><span></span></div>
-              <div class="phone-list"><span>Pickup alert</span><b>On</b></div>
-              <div class="phone-list"><span>Guardian chat</span><b>2 new</b></div>
-              <div class="phone-list"><span>Weekly rides</span><b>9</b></div>
-            </div>
-            <div *ngSwitchCase="'driver-app'" class="driver-phone">
-              <h3>Pre-trip</h3>
-              <div class="driver-hero"><strong>R1 Main Loop</strong><span>Depart in 08:14</span></div>
-              <div class="check-row"><mat-icon>check_circle</mat-icon>Vehicle inspection</div>
-              <div class="check-row"><mat-icon>check_circle</mat-icon>Student manifest synced</div>
-              <div class="check-row pending"><mat-icon>radio_button_unchecked</mat-icon>Start route</div>
-              <button>Begin trip</button>
-            </div>
-          </div>
-          <div class="home-indicator"></div>
-        </div>
-      </div>
-    </section>
   </main>
 </div>
 

@@ -72,6 +72,21 @@
           },
           "defaultConfiguration": "development"
         },
+        "build-ghpages": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/gh-pages",
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              { "glob": "**/*", "input": "public" }
+            ],
+            "styles": ["src/styles.css"],
+            "baseHref": "/frontend/",
+            "optimization": true,
+            "outputHashing": "all"
+          }
+        },
         "test": {
           "builder": "@angular/build:unit-test"
         }

@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -31,16 +31,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build -- --configuration production --base-href /routex-frontend/ --deploy-url /routex-frontend/
+      - name: Build for GitHub Pages (browser-only, no SSR)
+        run: npx ng run frontend:build-ghpages
 
-      - name: SPA fallback
-        run: cp dist/frontend/browser/index.html dist/frontend/browser/404.html
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/gh-pages/browser/index.html dist/gh-pages/browser/404.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/frontend/browser
+          path: dist/gh-pages/browser
 
   deploy:
     needs: build
@@ -49,6 +49,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

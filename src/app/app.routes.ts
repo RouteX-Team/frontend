@@ -1,39 +1,84 @@
 import { Routes } from '@angular/router';
-import { authGuard, roleGuard } from './core/auth.guard';
-import { LoginComponent } from './login.component';
-import { RoleAppComponent } from './role-app.component';
-import { RoleRedirectComponent } from './role-redirect.component';
-import { WorkspaceComponent } from './workspace.component';
+import { authGuard, roleGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: '', pathMatch: 'full', component: RoleRedirectComponent, canActivate: [authGuard] },
-  { path: 'tracking', pathMatch: 'full', redirectTo: 'admin/tracking' },
-  { path: 'dashboard', pathMatch: 'full', redirectTo: 'admin/dashboard' },
-  { path: 'admin', pathMatch: 'full', redirectTo: 'admin/tracking' },
+  // --- Public ---
   {
-    path: 'admin/:screen',
-    component: WorkspaceComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['admin'] },
+    path: 'login',
+    loadComponent: () => import('./features/auth/login').then((m) => m.Login),
   },
   {
-    path: 'student',
-    component: RoleAppComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['student'], role: 'student' },
+    path: 'register',
+    loadComponent: () => import('./features/auth/register').then((m) => m.Register),
   },
   {
-    path: 'parent',
-    component: RoleAppComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['parent'], role: 'parent' },
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/forgot-password').then((m) => m.ForgotPassword),
   },
   {
-    path: 'driver',
-    component: RoleAppComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['driver'], role: 'driver' },
+    path: 'forbidden',
+    loadComponent: () => import('./features/auth/forbidden').then((m) => m.Forbidden),
   },
-  { path: '**', component: RoleRedirectComponent, canActivate: [authGuard] },
+
+  // --- Authenticated shell ---
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadComponent: () => import('./shared/layout/main-layout').then((m) => m.MainLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+
+      // Routes (student + admin browse)
+      {
+        path: 'routes',
+        loadComponent: () => import('./features/routes/route-list').then((m) => m.RouteList),
+      },
+      {
+        path: 'routes/:id',
+        loadComponent: () =>
+          import('./features/routes/route-detail').then((m) => m.RouteDetailComponent),
+      },
+
+      // Live tracking (M4)
+      {
+        path: 'track',
+        loadComponent: () => import('./features/tracking/live-map').then((m) => m.LiveMap),
+      },
+      {
+        path: 'favorites',
+        loadComponent: () => import('./features/favorites/favorites-page').then((m) => m.FavoritesPage),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./features/notifications/notifications-page').then((m) => m.NotificationsPage),
+      },
+      {
+        path: 'driver',
+        canActivate: [roleGuard('Driver', 'Admin')],
+        loadComponent: () => import('./features/driver/driver-console').then((m) => m.DriverConsole),
+      },
+
+      // Admin area
+      {
+        path: 'admin',
+        canActivate: [roleGuard('Admin')],
+        children: [
+          { path: '', loadComponent: () => import('./features/admin/admin-home').then((m) => m.AdminHome) },
+          { path: 'routes', loadComponent: () => import('./features/admin/admin-routes').then((m) => m.AdminRoutes) },
+          { path: 'stops', loadComponent: () => import('./features/admin/admin-stops').then((m) => m.AdminStops) },
+          { path: 'buses', loadComponent: () => import('./features/admin/admin-buses').then((m) => m.AdminBuses) },
+          { path: 'users', loadComponent: () => import('./features/admin/admin-users').then((m) => m.AdminUsers) },
+          { path: 'announcements', loadComponent: () => import('./features/admin/admin-announcements').then((m) => m.AdminAnnouncements) },
+          { path: 'reports', loadComponent: () => import('./features/admin/admin-reports').then((m) => m.AdminReports) },
+        ],
+      },
+    ],
+  },
+
+  { path: '**', redirectTo: '' },
 ];

@@ -1,70 +1,52 @@
-@import 'leaflet/dist/leaflet.css';
 @import 'tailwindcss';
-@import '../Routex/tokens.css';
 
-.material-symbols-rounded {
-  font-family: 'Material Symbols Rounded';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-flex;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'liga';
-}
-
-mat-icon,
-.mat-icon {
-  font-family: 'Material Symbols Rounded';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: 0;
-  text-transform: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'liga';
+:root {
+  color-scheme: light;
 }
 
 html,
-body,
-app-root {
-  min-height: 100%;
+body {
+  height: 100%;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+  background: #f6f7f9;
+  color: #1f2530;
 }
 
-button {
-  cursor: default;
+/* Leaflet map containers must have an explicit height */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
 }
 
-.rx-card.glass {
-  background: color-mix(in oklch, var(--surface) 76%, transparent);
-  backdrop-filter: blur(14px) saturate(150%);
+.routex-map {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 
-.rx-bus-pin .material-symbols-rounded {
-  transform: rotate(45deg);
-  font-size: 17px;
+/* Live bus markers on the Leaflet map */
+.routex-bus-marker {
+  background: transparent;
+  border: 0;
 }
 
-.rx-btn .material-symbols-rounded,
-.rx-chip .material-symbols-rounded {
-  font-size: 16px;
+.routex-bus-dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.4));
+  transition: transform 0.5s ease;
+}
+
+.routex-bus-dot.is-stale {
+  opacity: 0.45;
+  filter: grayscale(1);
 }
